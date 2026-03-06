@@ -1,402 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KYC Verification â€” CryptoCard</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="icons.js"></script>
-  <style>
-    .kyc-wrapper {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .kyc-panel { display: none; animation: fadeInUp 0.4s ease; }
-    .kyc-panel.active { display: block; }
-
-    .doc-type-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .doc-type {
-      border: 2px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 20px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    .doc-type:hover, .doc-type.selected {
-      border-color: var(--accent-primary);
-      background: rgba(99,102,241,0.08);
-    }
-    .doc-type .doc-icon { font-size: 2rem; margin-bottom: 8px; }
-    .doc-type .doc-label { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
-
-    .upload-zone {
-      border: 2px dashed var(--border-bright);
-      border-radius: var(--radius-md);
-      padding: 40px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-bottom: 16px;
-    }
-    .upload-zone:hover {
-      border-color: var(--accent-primary);
-      background: rgba(99,102,241,0.04);
-    }
-    .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .upload-text { font-size: 0.9rem; color: var(--text-secondary); }
-    .upload-limit { font-size: 0.78rem; color: var(--text-muted); margin-top: 6px; }
-
-    .camera-view {
-      background: var(--bg-surface);
-      border-radius: var(--radius-md);
-      height: 280px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    .camera-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .face-frame {
-      width: 160px;
-      height: 200px;
-      border: 3px solid var(--accent-primary);
-      border-radius: 50%;
-      box-shadow: 0 0 30px var(--accent-glow);
-      animation: pulse-glow 2s ease-in-out infinite;
-    }
-
-    .spinner-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 40px 0;
-    }
-    .spinner {
-      width: 64px;
-      height: 64px;
-      border: 4px solid rgba(99,102,241,0.2);
-      border-top-color: var(--accent-primary);
-      border-radius: 50%;
-      animation: spin-slow 1s linear infinite;
-    }
-
-    .success-container {
-      text-align: center;
-      padding: 40px 0;
-    }
-    .success-icon-wrap {
-      width: 80px;
-      height: 80px;
-      background: rgba(16,185,129,0.1);
-      border: 2px solid var(--accent-green);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      margin: 0 auto 24px;
-      animation: pulse-glow 2s ease-in-out infinite;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>KYC &mdash; CryptoCard</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0B0E11;color:#EAECEF;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
+.page-layout{display:flex;}
+.sidebar{width:220px;background:#0D1117;border-right:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;padding:24px 0;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s;}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 20px 24px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;color:#EAECEF;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:12px;}
+.sidebar-logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.sidebar-nav{list-style:none;flex:1;padding:0 8px;}
+.sidebar-nav li a{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;color:rgba(234,236,239,.55);text-decoration:none;font-size:.875rem;font-weight:500;transition:all .2s;margin-bottom:2px;}
+.sidebar-nav li a:hover,.sidebar-nav li a.active{background:rgba(240,185,11,.08);color:#F0B90B;}
+.sidebar-nav li a.active svg{stroke:#F0B90B;}
+.sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);}
+.logout-btn{width:100%;display:flex;align-items:center;gap:8px;padding:10px 14px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:rgba(234,236,239,.5);font-size:.84rem;cursor:pointer;font-family:inherit;transition:all .2s;}
+.logout-btn:hover{border-color:rgba(239,68,68,.4);color:#EF4444;}
+.page-main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh;}
+.page-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.page-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;color:#EAECEF;}
+.page-subtitle{font-size:.82rem;color:rgba(234,236,239,.4);margin-top:4px;}
+.avatar-circle{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#F0B90B,#F8D12F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#000;cursor:pointer;font-family:'Space Grotesk',sans-serif;}
+.card-box{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px;margin-bottom:20px;}
+.card-box-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;color:#EAECEF;margin-bottom:16px;}
+.form-label{font-size:.76rem;color:rgba(234,236,239,.5);font-weight:600;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.4px;}
+.form-input{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:#EAECEF;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:rgba(240,185,11,.4);}
+.form-select{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:#EAECEF;font-size:.9rem;font-family:inherit;outline:none;}
+.form-group{margin-bottom:18px;}
+.btn-gold{background:linear-gradient(135deg,#F0B90B,#F8D12F);color:#000;font-weight:700;border:none;border-radius:10px;padding:13px 28px;font-size:.9rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;justify-content:center;}
+.btn-gold:hover{opacity:.85;}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 22px;color:rgba(234,236,239,.7);font-size:.88rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
+.btn-ghost:hover{border-color:rgba(255,255,255,.2);color:#EAECEF;}
+.step-progress{display:flex;align-items:center;gap:0;margin-bottom:28px;}
+.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0;font-family:'Space Grotesk',sans-serif;transition:all .3s;}
+.step-line-seg{flex:1;height:2px;transition:background .3s;}
+.step-block{display:none;}
+.step-block.active{display:block;}
+input[type=file]{display:none;}
+.file-drop{border:2px dashed rgba(255,255,255,.1);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s;font-size:.85rem;color:rgba(234,236,239,.4);}
+.file-drop:hover{border-color:rgba(240,185,11,.35);color:#F0B90B;}
+.two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.mob-menu-btn{display:none;position:fixed;bottom:20px;left:20px;z-index:200;width:44px;height:44px;border-radius:50%;background:#F0B90B;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(240,185,11,.4);}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+@media(max-width:900px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.page-main{margin-left:0;padding:20px 16px 80px}.mob-menu-btn{display:flex}.sidebar-backdrop.show{display:block}}
+@media(max-width:600px){.two-col-grid{grid-template-columns:1fr}.page-title{font-size:1.2rem}.card-box{padding:16px}}
+</style>
 </head>
 <body>
-<div class="dashboard-layout">
-  <aside class="sidebar">
-    <a href="index.html" class="sidebar-logo"><div class="nav-logo-icon">ðŸ’³</div>CryptoCard</a>
-    <ul class="sidebar-nav">
-      <li><a href="dashboard.html"><span class="nav-icon">âŠž</span> Dashboard</a></li>
-      <li><a href="deposit.html"><span class="nav-icon">â¬‡</span> Deposit USDC</a></li>
-      <li><a href="card.html"><span class="nav-icon">ðŸ’³</span> Card Management</a></li>
-      <li><a href="transactions.html"><span class="nav-icon">â†•</span> Transactions</a></li>
-      <li><a href="kyc.html" class="active"><span class="nav-icon">ðŸªª</span> KYC Verification</a></li>
-      <li><a href="settings.html"><span class="nav-icon">âš™</span> Settings</a></li>
-    </ul>
-    <div style="padding:24px 12px;position:absolute;bottom:0;left:0;right:0;border-top:1px solid var(--border);">
-      <a href="index.html" class="btn btn-secondary btn-sm" style="width:100%;justify-content:center;">â† Logout</a>
+<script src="auth.js"></script>
+<script>if(!authGuard()){}</script>
+<div class="page-layout">
+<aside class="sidebar" id="sidebar">
+  <a href="index.html" class="sidebar-logo">
+    <div class="sidebar-logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+    CryptoCard
+  </a>
+  <ul class="sidebar-nav">
+    <li><a href="dashboard.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="3" y="15" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="11" rx="1"/></svg>Dashboard</a></li>
+    <li><a href="deposit.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></svg>Deposit</a></li>
+    <li><a href="card.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Card</a></li>
+    <li><a href="transactions.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg>Transactions</a></li>
+    <li><a href="kyc.html" class="active"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>KYC</a></li>
+    <li><a href="settings.html"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</a></li>
+  </ul>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </div>
+</aside>
+
+<div class="page-main">
+  <div class="page-topbar">
+    <div>
+      <div class="page-title">KYC Verification</div>
+      <div class="page-subtitle">Complete in 3 steps &mdash; review takes up to 3 working days</div>
     </div>
-  </aside>
+    <div class="avatar-circle" id="userAvatar"></div>
+  </div>
 
-  <div class="main-content">
-    <div class="topbar">
-      <div>
-        <div class="topbar-title">KYC Verification</div>
-        <div style="font-size:0.8rem;color:var(--text-muted);">Identity verification required to unlock your card</div>
+  <div class="card-box" style="max-width:700px;">
+    <!-- Step progress bar -->
+    <div class="step-progress">
+      <div class="step-dot" id="sn1" style="background:#F0B90B;color:#000;">1</div>
+      <div class="step-line-seg" id="sl1" style="background:rgba(255,255,255,.08);"></div>
+      <div class="step-dot" id="sn2" style="background:rgba(255,255,255,.08);color:rgba(234,236,239,.4);">2</div>
+      <div class="step-line-seg" id="sl2" style="background:rgba(255,255,255,.08);"></div>
+      <div class="step-dot" id="sn3" style="background:rgba(255,255,255,.08);color:rgba(234,236,239,.4);">3</div>
+    </div>
+
+    <!-- STEP 1: Personal -->
+    <div class="step-block active" id="step1">
+      <div class="card-box-title">Personal Information</div>
+      <div class="two-col-grid">
+        <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" id="kFN" placeholder="John" required /></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" id="kLN" placeholder="Doe" required /></div>
       </div>
-      <div class="topbar-actions">
-        <div class="notification-btn">ðŸ””<div class="notification-dot"></div></button>
-        <div class="avatar-btn" id="avatarBtn">K</div>
+      <div class="form-group"><label class="form-label">Date of Birth</label><input type="date" class="form-input" id="kDOB" required /></div>
+      <div class="form-group"><label class="form-label">Nationality</label>
+        <select class="form-select" id="kNAT" required>
+          <option value="">Select country...</option>
+          <option>India</option><option>United States</option><option>United Kingdom</option>
+          <option>Germany</option><option>Singapore</option><option>UAE</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Residential Address</label><input type="text" class="form-input" id="kADDR" placeholder="123 Main St, City, State, ZIP" required /></div>
+      <button class="btn-gold" style="width:100%;" onclick="nextKYC(1)">Continue &rarr;</button>
+    </div>
+
+    <!-- STEP 2: Document -->
+    <div class="step-block" id="step2">
+      <div class="card-box-title">Identity Document</div>
+      <div class="form-group"><label class="form-label">Document Type</label>
+        <select class="form-select" id="kDOCT" required>
+          <option value="">Select...</option>
+          <option>Passport</option><option>National ID</option><option>Driving License</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Document Number</label><input type="text" class="form-input" id="kDOCN" placeholder="Enter document number" required /></div>
+      <div class="form-group">
+        <label class="form-label">Upload Front</label>
+        <div class="file-drop" onclick="document.getElementById('kF1').click()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:6px;opacity:.4;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><br/>
+          Click to upload front of document<br/>
+          <small style="font-size:.72rem;opacity:.5;">JPG, PNG or PDF &bull; Max 10MB</small>
+        </div>
+        <input type="file" id="kF1" accept="image/*,.pdf" onchange="filePicked(this,'kF1Status')" />
+        <div id="kF1Status" style="font-size:.75rem;color:#0ECB81;margin-top:4px;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Upload Back <small style="opacity:.5;font-size:.72rem;">(not required for passport)</small></label>
+        <div class="file-drop" onclick="document.getElementById('kF2').click()">Click to upload back of document</div>
+        <input type="file" id="kF2" accept="image/*,.pdf" onchange="filePicked(this,'kF2Status')" />
+        <div id="kF2Status" style="font-size:.75rem;color:#0ECB81;margin-top:4px;"></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-ghost" onclick="goKYC(1)">&larr; Back</button>
+        <button class="btn-gold" style="flex:1;" onclick="nextKYC(2)">Continue &rarr;</button>
       </div>
     </div>
 
-    <div class="page-content">
-      <div class="kyc-wrapper">
-
-        <!-- Step Indicators -->
-        <div class="kyc-steps" style="margin-bottom:40px;">
-          <div class="kyc-step active" id="step-dot-1">
-            <div class="kyc-step-dot">1<span class="kyc-step-label">Personal</span></div>
-          </div>
-          <div class="kyc-step-line" id="line-1"></div>
-          <div class="kyc-step" id="step-dot-2">
-            <div class="kyc-step-dot">2<span class="kyc-step-label">Document</span></div>
-          </div>
-          <div class="kyc-step-line" id="line-2"></div>
-          <div class="kyc-step" id="step-dot-3">
-            <div class="kyc-step-dot">3<span class="kyc-step-label">Selfie</span></div>
-          </div>
-          <div class="kyc-step-line" id="line-3"></div>
-          <div class="kyc-step" id="step-dot-4">
-            <div class="kyc-step-dot">4<span class="kyc-step-label">Verify</span></div>
-          </div>
-          <div class="kyc-step-line" id="line-4"></div>
-          <div class="kyc-step" id="step-dot-5">
-            <div class="kyc-step-dot">âœ“<span class="kyc-step-label">Done</span></div>
-          </div>
+    <!-- STEP 3: Selfie -->
+    <div class="step-block" id="step3">
+      <div class="card-box-title">Selfie Verification</div>
+      <div class="form-group">
+        <label class="form-label">Take or Upload a Selfie</label>
+        <div class="file-drop" onclick="document.getElementById('kF3').click()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:8px;opacity:.4;"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg><br/>
+          Hold document next to your face &bull; Good lighting<br/>
+          <small style="font-size:.72rem;opacity:.5;">JPG or PNG &bull; Max 10MB</small>
         </div>
+        <input type="file" id="kF3" accept="image/*" onchange="filePicked(this,'kF3Status')" />
+        <div id="kF3Status" style="font-size:.75rem;color:#0ECB81;margin-top:4px;"></div>
+      </div>
+      <div style="font-size:.8rem;color:rgba(234,236,239,.5);background:rgba(240,185,11,.05);border:1px solid rgba(240,185,11,.15);border-radius:10px;padding:13px 16px;margin-bottom:18px;">
+        After submission, our compliance team reviews your documents within <strong style="color:#F0B90B;">3 working days</strong>. You will receive an email notification once verified.
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-ghost" onclick="goKYC(2)">&larr; Back</button>
+        <button class="btn-gold" style="flex:1;" onclick="submitKYC()">Submit for Review</button>
+      </div>
+    </div>
 
-        <!-- STEP 1: Personal Info -->
-        <div class="kyc-panel active" id="panel-1">
-          <div class="section-card">
-            <div style="margin-bottom:24px;">
-              <h3>Personal Information</h3>
-              <p style="margin-top:6px;font-size:0.88rem;">Enter your legal name exactly as it appears on your government ID.</p>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-              <div class="form-group">
-                <label class="form-label">First Name *</label>
-                <input class="form-input" type="text" required placeholder="John" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Last Name *</label>
-                <input class="form-input" type="text" required placeholder="Doe" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Date of Birth *</label>
-              <input class="form-input" type="date" required />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Country of Residence *</label>
-              <select class="form-select">
-                <option>Select Country...</option>
-                <option>India</option><option>United States</option><option>United Kingdom</option>
-                <option>Canada</option><option>Germany</option><option>Singapore</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Residential Address *</label>
-              <input class="form-input" type="text" required placeholder="Street Address" style="margin-bottom:10px;" />
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                <input class="form-input" type="text" required placeholder="City" />
-                <input class="form-input" type="text" required placeholder="ZIP / Post Code" />
-              </div>
-            </div>
-            <button class="btn btn-primary" style="width:100%;" onclick="nextKycStep()">Continue â†’</button>
-          </div>
-        </div>
-
-        <!-- STEP 2: Document Upload -->
-        <div class="kyc-panel" id="panel-2">
-          <div class="section-card">
-            <div style="margin-bottom:24px;">
-              <h3>ID Document</h3>
-              <p style="margin-top:6px;font-size:0.88rem;">Upload a clear photo of your government-issued ID document.</p>
-            </div>
-            <div class="doc-type-grid">
-              <div class="doc-type selected" onclick="selectDocType(this)">
-                <div class="doc-icon">ðŸ“”</div>
-                <div class="doc-label">Passport</div>
-              </div>
-              <div class="doc-type" onclick="selectDocType(this)">
-                <div class="doc-icon">ðŸªª</div>
-                <div class="doc-label">National ID</div>
-              </div>
-              <div class="doc-type" onclick="selectDocType(this)">
-                <div class="doc-icon">ðŸš—</div>
-                <div class="doc-label">Driver's License</div>
-              </div>
-            </div>
-            <div class="upload-zone" onclick="this.querySelector('input').click()">
-              <input type="file" accept="image/*" style="display:none;">
-              <div class="upload-icon">ðŸ“¤</div>
-              <div class="upload-text">Click or drag to upload front of document</div>
-              <div class="upload-limit">JPEG, PNG or PDF Â· Max 10MB Â· Min 300 DPI</div>
-            </div>
-            <div class="upload-zone" onclick="this.querySelector('input').click()">
-              <input type="file" accept="image/*" style="display:none;">
-              <div class="upload-icon">ðŸ“„</div>
-              <div class="upload-text">Click or drag to upload back of document</div>
-              <div class="upload-limit">Required for National ID and Driver's License</div>
-            </div>
-            <div style="display:flex;gap:10px;">
-              <button class="btn btn-secondary" style="flex:1;" onclick="goToKycStep(1)">â† Back</button>
-              <button class="btn btn-primary" style="flex:2;" onclick="nextKycStep()">Continue â†’</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 3: Selfie -->
-        <div class="kyc-panel" id="panel-3">
-          <div class="section-card">
-            <div style="margin-bottom:24px;">
-              <h3>Selfie Verification</h3>
-              <p style="margin-top:6px;font-size:0.88rem;">Take a selfie to verify you're the person in your ID document. Ensure good lighting and face the camera directly.</p>
-            </div>
-            <div class="camera-view">
-              <div style="font-size:3rem;opacity:0.3;">ðŸ“·</div>
-              <div style="font-size:0.88rem;color:var(--text-muted);margin-top:8px;">Camera preview</div>
-              <div class="camera-overlay">
-                <div class="face-frame"></div>
-              </div>
-            </div>
-            <div style="text-align:center;margin:16px 0;font-size:0.82rem;color:var(--text-muted);">Position your face within the oval frame</div>
-            <div style="display:flex;gap:10px;">
-              <button class="btn btn-secondary" style="flex:1;" onclick="goToKycStep(2)">â† Back</button>
-              <button class="btn btn-primary" style="flex:2;" onclick="startVerification()">ðŸ“¸ Capture & Verify</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 4: Processing -->
-        <div class="kyc-panel" id="panel-4">
-          <div class="section-card">
-            <div class="spinner-container">
-              <div class="spinner"></div>
-              <div>
-                <h3 style="text-align:center;margin-bottom:8px;">Verifying Your Identity</h3>
-                <p style="text-align:center;font-size:0.88rem;">AI-powered verification in progress. This usually takes 30â€“60 seconds...</p>
-              </div>
-              <div style="width:100%;max-width:300px;">
-                <div style="display:flex;flex-direction:column;gap:12px;" id="verifySteps">
-                  <div class="verify-item" style="display:flex;align-items:center;gap:12px;font-size:0.85rem;">
-                    <span id="vs1">â³</span> Checking document authenticity
-                  </div>
-                  <div class="verify-item" style="display:flex;align-items:center;gap:12px;font-size:0.85rem;">
-                    <span id="vs2">â³</span> Cross-referencing personal info
-                  </div>
-                  <div class="verify-item" style="display:flex;align-items:center;gap:12px;font-size:0.85rem;">
-                    <span id="vs3">â³</span> Facial recognition matching
-                  </div>
-                  <div class="verify-item" style="display:flex;align-items:center;gap:12px;font-size:0.85rem;">
-                    <span id="vs4">â³</span> Sanctions & PEP screening
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- STEP 5: Approved -->
-        <div class="kyc-panel" id="panel-5">
-          <div class="section-card">
-            <div class="success-container">
-              <div class="success-icon-wrap">âœ…</div>
-              <h2 style="color:var(--accent-green);margin-bottom:12px;">Identity Verified!</h2>
-              <p>Your identity has been successfully verified. Your account limits are now fully unlocked.</p>
-              <div style="background:var(--bg-surface);border-radius:var(--radius-md);padding:20px;margin:24px 0;text-align:left;">
-                <div style="font-size:0.82rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">Unlocked Limits</div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.88rem;">
-                  <div><div style="color:var(--text-muted);">Daily Limit</div><div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent-green);">$5,000</div></div>
-                  <div><div style="color:var(--text-muted);">Monthly Limit</div><div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent-green);">$20,000</div></div>
-                  <div><div style="color:var(--text-muted);">Cards Allowed</div><div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent-green);">Up to 3</div></div>
-                  <div><div style="color:var(--text-muted);">KYC Level</div><div style="font-family:'Space Mono',monospace;font-weight:700;color:var(--accent-green);">Level 2 âœ“</div></div>
-                </div>
-              </div>
-              <a href="dashboard.html" class="btn btn-primary btn-lg" style="width:100%;">Go to Dashboard â†’</a>
-            </div>
-          </div>
-        </div>
-
+    <!-- DONE -->
+    <div class="step-block" id="stepDone">
+      <div style="text-align:center;padding:40px 0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0ECB81" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px;"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:#EAECEF;margin-bottom:10px;">Documents Submitted!</div>
+        <div style="font-size:.85rem;color:rgba(234,236,239,.5);max-width:380px;margin:0 auto 24px;">Your KYC documents have been submitted successfully. Verification will be completed within <strong style="color:#F0B90B;">3 working days</strong>. Check your email for updates.</div>
+        <a href="dashboard.html" class="btn-gold" style="text-decoration:none;">Back to Dashboard</a>
       </div>
     </div>
   </div>
 </div>
+</div>
 
-
-<!-- Mobile Sidebar Toggle -->
-<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-<button class="sidebar-mobile-toggle" id="sidebarToggle" aria-label="Menu">☰</button>
-<script src="auth.js"></script><script>if(!authGuard()){};</script>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+<button class="mob-menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+</button>
+<div class="toast" id="pageToast"></div>
 <script src="app.js"></script>
 <script>
-  function selectDocType(el) {
-    document.querySelectorAll('.doc-type').forEach(d => d.classList.remove('selected'));
-    el.classList.add('selected');
-  }
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarBackdrop').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarBackdrop').classList.remove('show');}
+function showToast(m){const t=document.getElementById('pageToast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+const _u=getCurrentUser();if(_u&&document.getElementById('userAvatar'))document.getElementById('userAvatar').textContent=_u.name.charAt(0).toUpperCase();
 
-  function goToKycStep(step) {
-    // Update panels
-    document.querySelectorAll('.kyc-panel').forEach((p, i) => {
-      p.classList.toggle('active', i + 1 === step);
-    });
-    // Update step dots
-    document.querySelectorAll('.kyc-step').forEach((d, i) => {
-      if (i + 1 < step) {
-        d.classList.add('completed');
-        d.classList.remove('active');
-      } else if (i + 1 === step) {
-        d.classList.add('active');
-        d.classList.remove('completed');
-      } else {
-        d.classList.remove('completed', 'active');
-      }
-    });
+function goKYC(n){
+  [1,2,3].forEach(i=>{
+    document.getElementById('step'+i).classList.remove('active');
+    const sn=document.getElementById('sn'+i);
+    sn.style.background=i<=n?'#F0B90B':'rgba(255,255,255,.08)';
+    sn.style.color=i<=n?'#000':'rgba(234,236,239,.4)';
+    if(i<3){const sl=document.getElementById('sl'+i);if(sl)sl.style.background=i<n?'#F0B90B':'rgba(255,255,255,.08)';}
+  });
+  document.getElementById('step'+n).classList.add('active');
+}
+function nextKYC(from){
+  const req={1:['kFN','kLN','kDOB','kNAT','kADDR'],2:['kDOCT','kDOCN']};
+  for(const id of (req[from]||[])){
+    const el=document.getElementById(id);
+    if(!el||!el.value.trim()){showToast('Please fill in all required fields');if(el)el.focus();return;}
   }
-
-  function nextKycStep() {
-    const current = document.querySelector('.kyc-panel.active');
-    const panels = Array.from(document.querySelectorAll('.kyc-panel'));
-    const idx = panels.indexOf(current);
-    if (idx < panels.length - 1) goToKycStep(idx + 2);
-  }
-
-  function startVerification() {
-    goToKycStep(4);
-    // Simulate verification
-    const steps = ['vs1','vs2','vs3','vs4'];
-    steps.forEach((id, i) => {
-      setTimeout(() => {
-        document.getElementById(id).textContent = 'âœ…';
-      }, (i + 1) * 1200);
-    });
-    setTimeout(() => { goToKycStep(5); }, 5500);
-  }
-</script>
-<script src="icons.js"></script>
-
-<script>
-  // Personalize avatar from auth
-  (function(){
-    var user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
-    if (user) {
-      var el = document.getElementById('avatarBtn');
-      if (el) el.textContent = user.name.charAt(0).toUpperCase();
-    }
-    if(window.lucide) lucide.createIcons();
-  })();
+  goKYC(from+1);
+}
+function filePicked(inp,sid){const s=document.getElementById(sid);if(inp.files&&inp.files[0])s.textContent='Selected: '+inp.files[0].name;else s.textContent='';}
+function submitKYC(){
+  const f3=document.getElementById('kF3');
+  if(!f3||!f3.files||!f3.files[0]){showToast('Please upload your selfie photo');return;}
+  [1,2,3].forEach(i=>document.getElementById('step'+i).classList.remove('active'));
+  document.getElementById('stepDone').classList.add('active');
+}
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
