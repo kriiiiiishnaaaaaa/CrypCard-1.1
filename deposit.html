@@ -160,6 +160,43 @@ body{background:#0B0E11;color:#fff;font-family:'IBM Plex Sans',-apple-system,san
         </div>
       </div>
       <div class="notice-box">Lowest network fees. TRC-20 USDC only. Funds arrive in ~1 min. Minimum 10 TRX in wallet for gas.</div>
+
+      <!-- FUND WALLET FORM -->
+      <div style="margin-top:18px;">
+        <button id="openFundBtn" onclick="toggleFundForm()" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border:none;border-radius:12px;color:#000;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          I've Sent — Add Funds
+        </button>
+
+        <!-- Form box -->
+        <div id="fundForm" style="display:none;margin-top:14px;background:#0D1117;border:1px solid rgba(240,185,11,.2);border-radius:14px;padding:20px;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.9rem;color:#fff;margin-bottom:4px;">Verify Your Deposit</div>
+          <div style="font-size:.74rem;color:rgba(255,255,255,.35);margin-bottom:16px;">Paste the transaction hash from your wallet after sending USDC/USDT to our TRC-20 address.</div>
+
+          <label style="font-size:.72rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;font-weight:600;display:block;margin-bottom:6px;">Transaction Hash (TxID)</label>
+          <input id="txHashInput" type="text" placeholder="e.g. a3f4b9c1d2e0..." style="width:100%;background:#161A1F;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:.8rem;outline:none;margin-bottom:12px;" />
+
+          <button onclick="submitDepositHash()" id="verifyBtn" style="width:100%;padding:12px;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.3);border-radius:10px;color:#F0B90B;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;">Verify &amp; Add to Wallet</button>
+
+          <!-- Status box -->
+          <div id="depositStatus" style="display:none;margin-top:14px;border-radius:10px;padding:14px 16px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div id="statusIcon" style="font-size:1.3rem;">⏳</div>
+              <div>
+                <div id="statusTitle" style="font-size:.86rem;font-weight:700;color:#fff;">Checking transaction...</div>
+                <div id="statusMsg" style="font-size:.74rem;color:rgba(255,255,255,.4);margin-top:2px;">Querying TronGrid. This may take up to 2 minutes.</div>
+              </div>
+            </div>
+            <div id="statusProgress" style="margin-top:12px;height:3px;background:rgba(255,255,255,.08);border-radius:100px;overflow:hidden;">
+              <div id="statusBar" style="height:100%;width:0%;background:#F0B90B;border-radius:100px;transition:width .5s;"></div>
+            </div>
+            <div id="statusTimer" style="font-size:.68rem;color:rgba(255,255,255,.25);margin-top:5px;text-align:right;"></div>
+          </div>
+        </div>
+
+        <!-- Past deposits list -->
+        <div id="pastDeposits" style="margin-top:14px;"></div>
+      </div>
     </div>
   </div>
 
@@ -266,7 +303,7 @@ const _u=getCurrentUser();
 if(_u){document.getElementById('avatarBtn').textContent=_u.name.charAt(0).toUpperCase();document.getElementById('ppAv').textContent=_u.name.charAt(0).toUpperCase();document.getElementById('ppName').textContent=_u.name;document.getElementById('ppEmail').textContent=_u.email||'cryptocard user';}
 function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarBackdrop').classList.toggle('show');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarBackdrop').classList.remove('show');}
-function showToast(m){const t=document.getElementById('dashToast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(m){const t=document.getElementById('dashToast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function toggleNotif(e){e.stopPropagation();closeProfile();const p=document.getElementById('notifPanel');p.style.display=p.style.display==='block'?'none':'block';}
 function closeNotif(){document.getElementById('notifPanel').style.display='none';}
 function toggleProfile(e){e.stopPropagation();closeNotif();const p=document.getElementById('profilePanel');p.style.display=p.style.display==='block'?'none':'block';}
@@ -275,6 +312,184 @@ document.addEventListener('click',()=>{closeNotif();closeProfile();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeNotif();closeProfile();}});
 function switchNet(n,btn){document.querySelectorAll('.net-tab').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.net-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('panel-'+n).classList.add('active');}
 function copyAddr(id){const v=document.getElementById(id).textContent.trim();navigator.clipboard.writeText(v).then(()=>showToast('Address copied!')).catch(()=>{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);showToast('Address copied!');});}
+
+/* ====== TRC-20 DEPOSIT VERIFICATION ====== */
+const TRON_ADDR   = 'TNsXmYuCXQV9BVUXVPehGvY6PZ32XikFKv';
+const TRON_APIKEY = 'c97a2e50-c0d0-4f04-9b17-6abbaba9835a';
+const POLL_INTERVAL = 15000; // 15 seconds
+const MAX_WAIT      = 120000; // 2 minutes
+
+function toggleFundForm(){
+  const f = document.getElementById('fundForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  if(f.style.display === 'block') document.getElementById('txHashInput').focus();
+  renderPastDeposits();
+}
+
+function getUsedHashes(){
+  try{return JSON.parse(localStorage.getItem('cc_used_hashes')||'[]');}catch{return [];}
+}
+function saveUsedHash(hash, result){
+  const arr = getUsedHashes();
+  arr.unshift({hash, result, ts: Date.now()});
+  localStorage.setItem('cc_used_hashes', JSON.stringify(arr.slice(0,20)));
+}
+
+function renderPastDeposits(){
+  const arr = getUsedHashes().slice(0,5);
+  const el = document.getElementById('pastDeposits');
+  if(!arr.length){el.innerHTML='';return;}
+  el.innerHTML = '<div style="font-size:.72rem;color:rgba(255,255,255,.3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;">Previous Submissions</div>'
+    + arr.map(h=>{
+      const ok = h.result.ok;
+      const color = ok?'#0ECB81':'#F6465D';
+      const icon = ok?'✅':'❌';
+      const amtStr = h.result.amount?`+${h.result.amount} ${h.result.token}`:'—';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#0D1117;border-radius:10px;margin-bottom:6px;gap:8px;">
+        <div style="min-width:0;flex:1;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:rgba(255,255,255,.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.hash}</div>
+          <div style="font-size:.68rem;color:rgba(255,255,255,.2);margin-top:2px;">${new Date(h.ts).toLocaleString('en-IN')}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:.82rem;font-weight:700;color:${color};">${icon} ${amtStr}</div>
+          <div style="font-size:.68rem;color:${color};opacity:.7;">${ok?'Credited':'Failed'}</div>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+let _pollTimer = null;
+
+async function submitDepositHash(){
+  const hashRaw = document.getElementById('txHashInput').value.trim();
+  if(!hashRaw){showToast('Please paste your transaction hash');return;}
+
+  // Check duplicate
+  const used = getUsedHashes();
+  if(used.find(h=>h.hash===hashRaw)){
+    showToast('This hash was already submitted');
+    setStatus('failed','Already Submitted','This transaction hash has already been used.');
+    return;
+  }
+
+  // Disable form
+  document.getElementById('verifyBtn').disabled = true;
+  document.getElementById('txHashInput').disabled = true;
+  document.getElementById('openFundBtn').disabled = true;
+
+  // Show pending status
+  const statusEl = document.getElementById('depositStatus');
+  statusEl.style.display = 'block';
+  statusEl.style.background = 'rgba(240,185,11,.06)';
+  statusEl.style.border = '1px solid rgba(240,185,11,.2)';
+  setStatus('pending','Verifying Transaction...','Polling TronGrid. Checking every 15 seconds. Timeout: 2 minutes.');
+
+  const startTime = Date.now();
+  let elapsed = 0;
+
+  if(_pollTimer) clearInterval(_pollTimer);
+
+  async function poll(){
+    elapsed = Date.now() - startTime;
+    const pct = Math.min((elapsed / MAX_WAIT) * 100, 100);
+    document.getElementById('statusBar').style.width = pct + '%';
+    const secLeft = Math.max(0, Math.round((MAX_WAIT - elapsed)/1000));
+    document.getElementById('statusTimer').textContent = `Time remaining: ${secLeft}s`;
+
+    // Timeout
+    if(elapsed >= MAX_WAIT){
+      clearInterval(_pollTimer);
+      saveUsedHash(hashRaw, {ok:false});
+      setStatus('failed','Transaction Not Found','No matching TRC-20 transfer found within 2 minutes. Ensure you sent to the correct TRX address.');
+      resetForm();
+      renderPastDeposits();
+      return;
+    }
+
+    try{
+      // Fetch recent TRC-20 txs to our address
+      const res = await fetch(`https://api.trongrid.io/v1/accounts/${TRON_ADDR}/transactions/trc20?limit=50&order_by=block_timestamp,desc`,
+        {headers:{'TRON-PRO-API-KEY': TRON_APIKEY}});
+      if(!res.ok) throw new Error('API error '+res.status);
+      const data = await res.json();
+      const txs = data.data || [];
+
+      // Find matching hash
+      const match = txs.find(tx =>
+        tx.transaction_id && tx.transaction_id.toLowerCase() === hashRaw.toLowerCase()
+        && tx.to && tx.to === TRON_ADDR
+      );
+
+      if(match){
+        clearInterval(_pollTimer);
+        const dec   = match.token_info?.decimals || 6;
+        const sym   = match.token_info?.symbol   || 'USDC';
+        const amount = parseFloat(match.value) / Math.pow(10, parseInt(dec));
+        const amtFixed = parseFloat(amount.toFixed(4));
+
+        // Credit wallet
+        creditWallet(amtFixed, sym, hashRaw);
+
+        saveUsedHash(hashRaw, {ok:true, amount:amtFixed, token:sym});
+        setStatus('success',`+${amtFixed} ${sym} Added!`,`Your deposit has been verified and added to your CryptoCard wallet.`);
+        renderPastDeposits();
+        resetForm();
+        showToast(`✅ ${amtFixed} ${sym} credited to your wallet!`);
+      }
+    } catch(e){
+      // Network error — keep polling silently
+      document.getElementById('statusMsg').textContent = `Retrying... (${e.message})`;
+    }
+  }
+
+  // First poll immediately
+  await poll();
+  _pollTimer = setInterval(poll, POLL_INTERVAL);
+}
+
+function creditWallet(amount, token, hash){
+  try{
+    // Get user from localStorage
+    const key = 'cryptocard_user';
+    const raw = localStorage.getItem(key);
+    if(!raw) return;
+    const user = JSON.parse(raw);
+    user.balance   = parseFloat(((user.balance||0) + amount).toFixed(4));
+    // Log to wallet history
+    if(!user.deposits) user.deposits = [];
+    user.deposits.unshift({hash, amount, token, ts: Date.now(), network:'TRC-20'});
+    localStorage.setItem(key, JSON.stringify(user));
+  } catch(e){
+    console.error('creditWallet error', e);
+  }
+}
+
+function setStatus(state, title, msg){
+  const icons = {pending:'⏳', success:'✅', failed:'❌'};
+  const colors = {pending:'rgba(240,185,11,.06)', success:'rgba(14,203,129,.06)', failed:'rgba(246,70,93,.06)'};
+  const borders = {pending:'rgba(240,185,11,.2)', success:'rgba(14,203,129,.2)', failed:'rgba(246,70,93,.2)'};
+  const el = document.getElementById('depositStatus');
+  el.style.background = colors[state];
+  el.style.border = '1px solid ' + borders[state];
+  document.getElementById('statusIcon').textContent = icons[state];
+  document.getElementById('statusTitle').textContent = title;
+  document.getElementById('statusMsg').textContent = msg;
+  if(state !== 'pending'){
+    document.getElementById('statusBar').style.width = state==='success'?'100%':'100%';
+    document.getElementById('statusBar').style.background = state==='success'?'#0ECB81':'#F6465D';
+    document.getElementById('statusTimer').textContent = '';
+  }
+}
+
+function resetForm(){
+  document.getElementById('verifyBtn').disabled = false;
+  document.getElementById('txHashInput').disabled = false;
+  document.getElementById('txHashInput').value = '';
+  document.getElementById('openFundBtn').disabled = false;
+}
+
+// Show previous deposits on load
+renderPastDeposits();
 </script>
 </body>
 </html>
