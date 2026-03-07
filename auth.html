@@ -6,159 +6,490 @@
 <title>Sign In — CryptoCard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:#0B0E11;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
 body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
-
-/* Background glow */
 body::before{content:'';position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(240,185,11,.07) 0%,transparent 65%);pointer-events:none;z-index:0;}
 
-.auth-card{position:relative;z-index:1;width:100%;max-width:420px;background:#161A1F;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 32px;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+.auth-card{position:relative;z-index:1;width:100%;max-width:440px;background:#161A1F;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 32px;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+@media(max-width:480px){.auth-card{padding:28px 20px;border-radius:18px;}}
 
+/* Logo */
 .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px;}
-.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .logo-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;color:#fff;}
 
-.tab-row{display:flex;background:#0D1117;border-radius:12px;padding:4px;margin-bottom:28px;}
+/* Step system */
+.step{display:none;animation:fadeUp .3s ease;}
+.step.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+/* Progress bar */
+.progress-row{display:flex;gap:5px;margin-bottom:24px;}
+.progress-dot{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.08);transition:background .3s;}
+.progress-dot.done{background:#F0B90B;}
+
+/* Back button */
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:none;border:none;color:rgba(255,255,255,.35);font-size:.8rem;cursor:pointer;padding:0;margin-bottom:16px;font-family:'IBM Plex Sans',sans-serif;transition:color .2s;}
+.back-btn:hover{color:#F0B90B;}
+
+/* Step titles */
+.step-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.4rem;color:#fff;margin-bottom:6px;}
+.step-sub{font-size:.82rem;color:rgba(255,255,255,.35);margin-bottom:22px;line-height:1.6;}
+
+/* Fields */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:.72rem;color:rgba(255,255,255,.4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.field input{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.field input:focus{border-color:rgba(240,185,11,.45);}
+.field input::placeholder{color:rgba(255,255,255,.2);}
+
+/* Error box */
+.err-box{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);border-radius:10px;padding:11px 14px;font-size:.82rem;color:#F6465D;margin-bottom:14px;display:none;}
+
+/* Buttons */
+.btn-gold{width:100%;padding:14px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:opacity .2s;margin-top:6px;}
+.btn-gold:hover{opacity:.9;}
+.btn-gold:disabled{opacity:.45;cursor:not-allowed;}
+.btn-ghost{width:100%;padding:13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:rgba(255,255,255,.6);font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;margin-top:8px;transition:all .2s;}
+.btn-ghost:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);}
+
+/* Tab row (login/signup chooser) */
+.tab-row{display:flex;background:#0D1117;border-radius:12px;padding:4px;margin-bottom:24px;}
 .tab-btn{flex:1;padding:10px;border:none;background:none;border-radius:9px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:.88rem;color:rgba(255,255,255,.35);cursor:pointer;transition:all .2s;}
 .tab-btn.active{background:#1E2329;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);}
 
-.form{display:none;} .form.active{display:block;}
+/* PIN numpad */
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:28px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.15);background:transparent;transition:all .2s;}
+.pin-dot.filled{background:#F0B90B;border-color:#F0B90B;box-shadow:0 0 10px rgba(240,185,11,.4);}
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;margin:0 auto;}
+.nk{height:62px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0D1117;color:#fff;font-family:'Space Grotesk',sans-serif;font-size:1.25rem;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-tap-highlight-color:transparent;}
+.nk:hover,.nk:active{background:rgba(240,185,11,.12);border-color:rgba(240,185,11,.35);transform:scale(.96);}
+.nk.empty{background:transparent;border-color:transparent;cursor:default;}
+.nk.del{font-size:.9rem;color:rgba(255,255,255,.4);}
+.nk.del:hover{color:#F6465D;border-color:rgba(246,70,93,.3);}
+.pin-label{text-align:center;font-size:.82rem;color:rgba(255,255,255,.35);margin-bottom:16px;}
 
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:.72rem;color:rgba(255,255,255,.4);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
-.field input{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
-.field input:focus{border-color:rgba(240,185,11,.4);}
-.field input::placeholder{color:rgba(255,255,255,.2);}
+/* Recovery phrase */
+.warn-box{background:rgba(246,70,93,.06);border:1px solid rgba(246,70,93,.2);border-radius:10px;padding:12px 14px;font-size:.8rem;color:rgba(246,70,93,.9);margin-bottom:16px;line-height:1.5;}
+.phrase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px;}
+.phrase-word{background:#0D1117;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:9px 10px;}
+.phrase-num{font-size:.66rem;color:rgba(255,255,255,.25);font-family:'IBM Plex Mono',monospace;margin-bottom:2px;}
+.phrase-word-text{font-size:.82rem;font-weight:600;color:#fff;}
+.copy-phrase-btn{width:100%;padding:11px;background:rgba(240,185,11,.06);border:1px solid rgba(240,185,11,.2);border-radius:10px;color:#F0B90B;font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;margin-bottom:14px;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.copy-phrase-btn:hover{background:rgba(240,185,11,.12);}
 
-.hint{font-size:.72rem;color:rgba(255,255,255,.25);margin-top:5px;}
+/* Verify grid */
+.verify-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.verify-item label{font-size:.72rem;color:#F0B90B;font-family:'IBM Plex Mono',monospace;font-weight:600;display:block;margin-bottom:5px;}
 
-.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;margin-top:6px;transition:opacity .2s;}
-.submit-btn:hover{opacity:.9;}
-.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+/* Success */
+.success-wrap{text-align:center;padding:8px 0;}
+.success-ring{width:80px;height:80px;border-radius:50%;border:3px solid #0ECB81;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(14,203,129,.3);}50%{box-shadow:0 0 0 14px rgba(14,203,129,0);}}
 
-.err-box{background:rgba(246,70,93,.08);border:1px solid rgba(246,70,93,.25);border-radius:10px;padding:11px 14px;font-size:.82rem;color:#F6465D;margin-bottom:14px;display:none;}
-
+/* Demo / divider */
 .divider{display:flex;align-items:center;gap:10px;margin:16px 0;}
 .divider span{font-size:.72rem;color:rgba(255,255,255,.2);}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07);}
-
 .demo-btn{width:100%;padding:12px;background:rgba(240,185,11,.06);border:1px solid rgba(240,185,11,.2);border-radius:12px;color:#F0B90B;font-family:'IBM Plex Sans',sans-serif;font-weight:600;font-size:.85rem;cursor:pointer;transition:all .2s;}
 .demo-btn:hover{background:rgba(240,185,11,.12);}
 
 .back-home{display:block;text-align:center;margin-top:20px;font-size:.8rem;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s;}
 .back-home:hover{color:#F0B90B;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2329;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.6);transition:transform .3s;z-index:9999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 <div class="auth-card">
   <div class="logo">
-    <div class="logo-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-    </div>
+    <div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
     <span class="logo-name">CryptoCard</span>
   </div>
 
-  <div class="tab-row">
-    <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
-    <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+  <!-- ══ STEP: WELCOME (login / signup chooser) ══ -->
+  <div class="step active" id="step-welcome">
+    <div class="tab-row">
+      <button class="tab-btn active" id="tabLogin" onclick="switchWelcome('login')">Sign In</button>
+      <button class="tab-btn" id="tabSignup" onclick="switchWelcome('signup')">Create Account</button>
+    </div>
+
+    <!-- LOGIN sub-form -->
+    <div id="welcomeLogin">
+      <div class="err-box" id="loginErr"></div>
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPwd" placeholder="••••••••" autocomplete="current-password"/></div>
+      <button class="btn-gold" id="loginBtn" onclick="doLogin()">Sign In →</button>
+      <div class="divider"><span>or try demo</span></div>
+      <button class="demo-btn" onclick="doDemo()">⚡ Login with Demo Account</button>
+    </div>
+
+    <!-- SIGNUP sub-form (just name/email/pass, rest handled in steps) -->
+    <div id="welcomeSignup" style="display:none;">
+      <div class="err-box" id="regErr"></div>
+      <div class="field"><label>Full Name</label><input type="text" id="regName" placeholder="John Doe" autocomplete="name"/></div>
+      <div class="field"><label>Email</label><input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email"/></div>
+      <div class="field"><label>Password <span style="color:rgba(255,255,255,.2);font-size:.7rem;">(min 6 chars)</span></label><input type="password" id="regPwd" placeholder="Create a password" autocomplete="new-password"/></div>
+      <div class="field"><label>Confirm Password</label><input type="password" id="regPwd2" placeholder="Repeat password" autocomplete="new-password"/></div>
+      <button class="btn-gold" id="regBtn" onclick="doSignupInfo()">Continue →</button>
+    </div>
+    <a href="index.html" class="back-home">← Back to homepage</a>
   </div>
 
-  <!-- LOGIN FORM -->
-  <div class="form active" id="loginForm">
-    <div class="err-box" id="loginErr"></div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"/>
+  <!-- ══ STEP: CREATE PIN ══ -->
+  <div class="step" id="step-pin">
+    <div class="progress-row">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot" id="pin-prog-2"></div>
+      <div class="progress-dot" id="pin-prog-3"></div>
+      <div class="progress-dot" id="pin-prog-4"></div>
     </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="loginPwd" placeholder="••••••••" autocomplete="current-password"/>
+    <div class="step-title">Set Your PIN</div>
+    <div class="step-sub" id="pinSubtitle">Choose a 6-digit PIN. You'll need this every time you open CryptoCard.</div>
+    <div class="err-box" id="pinErr"></div>
+    <div class="pin-label" id="pinLabel">Enter new PIN</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+      <div class="pin-dot" id="pd4"></div><div class="pin-dot" id="pd5"></div>
     </div>
-    <button class="submit-btn" id="loginBtn" onclick="doLogin()">Sign In →</button>
-
-    <div class="divider"><span>or try demo</span></div>
-    <button class="demo-btn" onclick="doDemo()">⚡ Login with Demo Account</button>
+    <div class="numpad" id="pinNumpad"></div>
   </div>
 
-  <!-- REGISTER FORM -->
-  <div class="form" id="registerForm">
-    <div class="err-box" id="regErr"></div>
-    <div class="field">
-      <label>Full Name</label>
-      <input type="text" id="regName" placeholder="John Doe" autocomplete="name"/>
+  <!-- ══ STEP: RECOVERY PHRASE ══ -->
+  <div class="step" id="step-recovery">
+    <div class="progress-row">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot" id="rec-prog-3"></div>
+      <div class="progress-dot" id="rec-prog-4"></div>
     </div>
-    <div class="field">
-      <label>Email</label>
-      <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email"/>
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input type="password" id="regPwd" placeholder="Min 6 characters" autocomplete="new-password"/>
-      <div class="hint">Use at least 6 characters.</div>
-    </div>
-    <button class="submit-btn" id="regBtn" onclick="doRegister()">Create Account →</button>
+    <div class="step-title">Recovery Phrase</div>
+    <div class="step-sub">Write down these 12 words in order and keep them safe. This is the only way to recover your account.</div>
+    <div class="warn-box">⚠️ <strong>Never share these words with anyone.</strong> Anyone with these words can access your account.</div>
+    <div class="phrase-grid" id="phraseGrid"></div>
+    <button class="copy-phrase-btn" onclick="copyPhrase()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+      Copy All 12 Words
+    </button>
+    <button class="btn-gold" onclick="goToVerify()">I've saved them safely →</button>
   </div>
 
-  <a href="index.html" class="back-home">← Back to homepage</a>
+  <!-- ══ STEP: VERIFY PHRASE ══ -->
+  <div class="step" id="step-verify">
+    <div class="progress-row">
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot done"></div>
+      <div class="progress-dot" id="ver-prog-4"></div>
+    </div>
+    <div class="step-title">Verify Phrase</div>
+    <div class="step-sub" id="verifySubtitle">Enter the words at the positions shown to confirm you saved your phrase.</div>
+    <div class="err-box" id="verifyErr"></div>
+    <div class="verify-grid" id="verifyGrid"></div>
+    <button class="btn-gold" onclick="doVerify()">Verify & Complete Setup →</button>
+  </div>
+
+  <!-- ══ STEP: SUCCESS ══ -->
+  <div class="step" id="step-success">
+    <div class="success-wrap">
+      <div class="success-ring">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0ECB81" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="step-title">You're all set!</div>
+      <p style="color:rgba(255,255,255,.4);font-size:.88rem;margin:12px 0 28px;line-height:1.6;">Your account is ready. Your virtual card is waiting in the dashboard.</p>
+      <button class="btn-gold" onclick="window.location.href='dashboard.html'">Go to Dashboard →</button>
+    </div>
+  </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script src="auth.js"></script>
 <script>
-// If already logged in, go straight to dashboard
-if(getCurrentUser()) window.location.href='dashboard.html';
+// ── redirect if already logged in ──
+if (getCurrentUser()) window.location.href = 'dashboard.html';
 
-function switchTab(tab){
-  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
-  document.getElementById('loginForm').classList.toggle('active', tab==='login');
-  document.getElementById('registerForm').classList.toggle('active', tab==='register');
-  document.getElementById('loginErr').style.display='none';
-  document.getElementById('regErr').style.display='none';
+// ── state ──
+let signupData    = {};
+let recoveryWords = [];
+let pinBuffer     = '';
+let confirmBuffer = '';
+let pinStage      = 'create'; // 'create' | 'confirm'
+let verifyPos     = [];
+
+// ── helpers ──
+function goTo(id) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function showErr(id, msg){
-  const el=document.getElementById(id);
-  el.textContent=msg; el.style.display='block';
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-function doLogin(){
-  const btn=document.getElementById('loginBtn');
-  const email=document.getElementById('loginEmail').value.trim();
-  const pwd=document.getElementById('loginPwd').value;
-  document.getElementById('loginErr').style.display='none';
-  if(!email||!pwd){showErr('loginErr','Please fill in all fields.');return;}
-  btn.disabled=true; btn.textContent='Signing in...';
-  const result=loginUser(email,pwd);
-  if(result.ok){window.location.href='dashboard.html';}
-  else{showErr('loginErr',result.error);btn.disabled=false;btn.textContent='Sign In →';}
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
 }
 
-function doRegister(){
-  const btn=document.getElementById('regBtn');
-  const name=document.getElementById('regName').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pwd=document.getElementById('regPwd').value;
-  document.getElementById('regErr').style.display='none';
-  if(!name||!email||!pwd){showErr('regErr','Please fill in all fields.');return;}
-  btn.disabled=true; btn.textContent='Creating account...';
-  const result=registerUser(name,email,pwd);
-  if(result.ok){window.location.href='dashboard.html';}
-  else{showErr('regErr',result.error);btn.disabled=false;btn.textContent='Create Account →';}
+// ── welcome tab toggle ──
+function switchWelcome(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+  document.getElementById('welcomeLogin').style.display  = isLogin ? 'block' : 'none';
+  document.getElementById('welcomeSignup').style.display = isLogin ? 'none'  : 'block';
+  document.getElementById('loginErr').style.display = 'none';
+  document.getElementById('regErr').style.display   = 'none';
 }
 
-function doDemo(){
-  const result=loginUser('test@gmail.com','Test12345');
-  if(result.ok)window.location.href='dashboard.html';
-  else alert('Demo account not found. Refresh the page and try again.');
+// ── LOGIN ──
+function doLogin() {
+  const btn   = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd   = document.getElementById('loginPwd').value;
+  document.getElementById('loginErr').style.display = 'none';
+  if (!email || !pwd) { showErr('loginErr', 'Please fill in all fields.'); return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const r = loginUser(email, pwd);
+  if (r.ok) { window.location.href = 'dashboard.html'; }
+  else { showErr('loginErr', r.error); btn.disabled = false; btn.textContent = 'Sign In →'; }
 }
 
-// Enter key support
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    if(document.getElementById('loginForm').classList.contains('active'))doLogin();
-    else doRegister();
+function doDemo() {
+  const r = loginUser('test@gmail.com', 'Test12345');
+  if (r.ok) window.location.href = 'dashboard.html';
+  else alert('Demo account not found. Refresh and try again.');
+}
+
+// ── SIGNUP STEP 1: Info ──
+function doSignupInfo() {
+  const btn  = document.getElementById('regBtn');
+  const name = document.getElementById('regName').value.trim();
+  const email= document.getElementById('regEmail').value.trim();
+  const pwd  = document.getElementById('regPwd').value;
+  const pwd2 = document.getElementById('regPwd2').value;
+  document.getElementById('regErr').style.display = 'none';
+
+  if (!name || !email || !pwd || !pwd2) { showErr('regErr', 'Please fill in all fields.'); return; }
+  if (name.length < 2)                  { showErr('regErr', 'Please enter your full name.'); return; }
+  if (!/^\S+@\S+\.\S+$/.test(email))   { showErr('regErr', 'Please enter a valid email.'); return; }
+  if (pwd.length < 6)                   { showErr('regErr', 'Password must be at least 6 characters.'); return; }
+  if (pwd !== pwd2)                     { showErr('regErr', 'Passwords do not match.'); return; }
+
+  // Check email not already taken
+  let users = [];
+  try { users = JSON.parse(localStorage.getItem('cc_users') || '[]'); } catch(e) {}
+  if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+    showErr('regErr', 'An account with this email already exists.'); return;
+  }
+
+  signupData = { name, email, password: pwd };
+  pinBuffer  = ''; confirmBuffer = ''; pinStage = 'create';
+  updatePinDots(0);
+  document.getElementById('pinLabel').textContent = 'Enter new PIN';
+  document.getElementById('pinErr').style.display = 'none';
+  buildNumpad();
+  goTo('step-pin');
+}
+
+// ── PIN NUMPAD ──
+function buildNumpad() {
+  const keys = ['1','2','3','4','5','6','7','8','9','empty','0','del'];
+  const container = document.getElementById('pinNumpad');
+  container.innerHTML = '';
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    if (k === 'empty') {
+      btn.className = 'nk empty';
+    } else if (k === 'del') {
+      btn.className = 'nk del';
+      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5a2 2 0 0 0-1.344.519l-6.328 5.74a1 1 0 0 0 0 1.481l6.328 5.741A2 2 0 0 0 10 19h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2z"/><path d="m12 9 6 6"/><path d="m18 9-6 6"/></svg>`;
+      btn.onclick = pinDel;
+    } else {
+      btn.className = 'nk';
+      btn.textContent = k;
+      btn.onclick = () => pinPress(k);
+    }
+    container.appendChild(btn);
+  });
+}
+
+function updatePinDots(count) {
+  for (let i = 0; i < 6; i++) {
+    document.getElementById('pd' + i).classList.toggle('filled', i < count);
+  }
+}
+
+function pinPress(digit) {
+  if (pinStage === 'create') {
+    if (pinBuffer.length < 6) {
+      pinBuffer += digit;
+      updatePinDots(pinBuffer.length);
+      if (pinBuffer.length === 6) {
+        setTimeout(() => {
+          pinStage = 'confirm';
+          confirmBuffer = '';
+          document.getElementById('pinLabel').textContent = 'Confirm your PIN';
+          document.getElementById('pinErr').style.display = 'none';
+          document.getElementById('pin-prog-2').classList.add('done');
+          updatePinDots(0);
+        }, 300);
+      }
+    }
+  } else {
+    if (confirmBuffer.length < 6) {
+      confirmBuffer += digit;
+      updatePinDots(confirmBuffer.length);
+      if (confirmBuffer.length === 6) setTimeout(validatePin, 300);
+    }
+  }
+}
+
+function pinDel() {
+  if (pinStage === 'create') {
+    pinBuffer = pinBuffer.slice(0, -1);
+    updatePinDots(pinBuffer.length);
+  } else {
+    confirmBuffer = confirmBuffer.slice(0, -1);
+    updatePinDots(confirmBuffer.length);
+  }
+}
+
+function validatePin() {
+  const err = document.getElementById('pinErr');
+  if (pinBuffer !== confirmBuffer) {
+    err.textContent = 'PINs do not match. Please try again.';
+    err.style.display = 'block';
+    confirmBuffer = ''; pinStage = 'create'; pinBuffer = '';
+    document.getElementById('pinLabel').textContent = 'Enter new PIN';
+    updatePinDots(0);
+    return;
+  }
+  signupData.pin = pinBuffer;
+  // Generate recovery phrase
+  recoveryWords = generateRecoveryPhrase();
+  renderPhraseGrid();
+  document.getElementById('rec-prog-3').classList.add('done');
+  goTo('step-recovery');
+}
+
+// ── RECOVERY PHRASE WORDLIST ──
+const WORDLIST = [
+  'abandon','ability','able','about','above','absent','absorb','abstract','absurd','abuse',
+  'access','accident','account','accuse','achieve','acid','acoustic','acquire','across','act',
+  'action','actor','actress','actual','adapt','add','addict','address','adjust','admit',
+  'adult','advance','advice','aerobic','afford','afraid','again','agent','agree','ahead',
+  'aim','air','airport','aisle','alarm','album','alcohol','alert','alien','all',
+  'alley','allow','almost','alone','alpha','already','also','alter','always','amateur',
+  'amazing','among','amount','amused','analyst','anchor','ancient','anger','angle','angry',
+  'animal','ankle','announce','annual','another','answer','antenna','antique','anxiety','apart',
+  'apple','approve','april','arch','arctic','area','arena','argue','arm','armor',
+  'army','around','arrange','arrest','arrive','arrow','art','artist','artwork','ask',
+  'assault','asset','assist','assume','asthma','athlete','atom','attack','attend','attitude',
+  'attract','auction','audit','august','aunt','author','auto','autumn','average','avocado',
+  'aware','awesome','awful','awkward','axis','badge','balance','bamboo','banana','banner',
+  'barely','bargain','barrel','base','basic','basket','battle','beach','bean','beauty',
+  'because','become','beef','before','begin','behave','behind','believe','below','benefit',
+  'best','betray','better','between','beyond','bicycle','birth','bitter','black','blade',
+  'blame','blanket','blast','bleak','bless','blind','block','blood','blossom','blue'
+];
+
+function generateRecoveryPhrase() {
+  const words = [];
+  while (words.length < 12) {
+    const idx = Math.floor(Math.random() * WORDLIST.length);
+    words.push(WORDLIST[idx]);
+  }
+  return words;
+}
+
+function renderPhraseGrid() {
+  document.getElementById('phraseGrid').innerHTML = recoveryWords.map((w, i) => `
+    <div class="phrase-word">
+      <div class="phrase-num">${i + 1}.</div>
+      <div class="phrase-word-text">${w}</div>
+    </div>
+  `).join('');
+}
+
+function copyPhrase() {
+  const text = recoveryWords.map((w, i) => `${i+1}. ${w}`).join('\n');
+  navigator.clipboard.writeText(text).catch(() => {});
+  showToast('Recovery phrase copied!');
+}
+
+// ── VERIFY PHRASE ──
+function goToVerify() {
+  // Pick 4 random positions (1-indexed, sorted)
+  verifyPos = [];
+  while (verifyPos.length < 4) {
+    const p = Math.floor(Math.random() * 12) + 1;
+    if (!verifyPos.includes(p)) verifyPos.push(p);
+  }
+  verifyPos.sort((a, b) => a - b);
+
+  document.getElementById('verifyGrid').innerHTML = verifyPos.map(p => `
+    <div class="verify-item">
+      <label>Word #${p}</label>
+      <input class="field input" type="text" id="vw${p}" placeholder="word ${p}"
+        autocapitalize="none" autocorrect="off"
+        style="width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:11px 13px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.88rem;outline:none;"/>
+    </div>
+  `).join('');
+
+  document.getElementById('ver-prog-4').classList.add('done');
+  document.getElementById('verifyErr').style.display = 'none';
+  goTo('step-verify');
+}
+
+function doVerify() {
+  const err = document.getElementById('verifyErr');
+  err.style.display = 'none';
+  for (const p of verifyPos) {
+    const val = (document.getElementById('vw' + p)?.value || '').trim().toLowerCase();
+    if (val !== recoveryWords[p - 1].toLowerCase()) {
+      err.textContent = `Word #${p} is incorrect. Check your saved phrase and try again.`;
+      err.style.display = 'block';
+      return;
+    }
+  }
+  // All correct — register the user
+  const r = registerUser(signupData.name, signupData.email, signupData.password);
+  if (!r.ok) {
+    err.textContent = r.error;
+    err.style.display = 'block';
+    return;
+  }
+  // Save pin + recovery phrase to user record
+  updateCurrentUser({ pin: signupData.pin, recoveryPhrase: recoveryWords });
+  goTo('step-success');
+}
+
+// ── ENTER KEY support ──
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.step.active');
+  if (!active) return;
+  const id = active.id;
+  if (id === 'step-welcome') {
+    const loginVisible = document.getElementById('welcomeLogin').style.display !== 'none';
+    if (loginVisible) doLogin(); else doSignupInfo();
+  } else if (id === 'step-verify') {
+    doVerify();
   }
 });
 </script>
