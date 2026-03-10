@@ -2419,3 +2419,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
 -e 
 /* Remove floating mobile menu button globally */
 .mob-btn, .mob-menu-btn { display: none !important; }
+
+/* Fix mobile blur on all pages */
+.page-main, .dash-main, .dash-layout, .page-layout {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+.sidebar-backdrop { backdrop-filter: none !important; }
