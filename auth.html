@@ -244,7 +244,7 @@ body::before{content:'';position:fixed;top:-200px;left:50%;transform:translateX(
       </div>
       <div class="step-title">You're all set!</div>
       <p style="color:rgba(255,255,255,.4);font-size:.88rem;margin:12px 0 28px;line-height:1.6;">Your account is ready. Your virtual card is waiting in the dashboard.</p>
-      <button class="btn-gold" onclick="window.location.href='dashboard.html'">Go to Dashboard →</button>
+      <button class="btn-gold" onclick="window.location.href='setup-currency.html'">Go to Dashboard →</button>
     </div>
   </div>
 </div>
@@ -304,13 +304,13 @@ function doLogin() {
   if (!email || !pwd) { showErr('loginErr', 'Please fill in all fields.'); return; }
   btn.disabled = true; btn.textContent = 'Signing in…';
   const r = loginUser(email, pwd);
-  if (r.ok) { window.location.href = 'dashboard.html'; }
+  if (r.ok) { window.location.href = r.user.defaultCurrency ? 'dashboard.html' : 'setup-currency.html'; }
   else { showErr('loginErr', r.error); btn.disabled = false; btn.textContent = 'Sign In →'; }
 }
 
 function doDemo() {
   const r = loginUser('test@gmail.com', 'Test12345');
-  if (r.ok) window.location.href = 'dashboard.html';
+  if (r.ok) window.location.href = r.user.defaultCurrency ? 'dashboard.html' : 'setup-currency.html';
   else alert('Demo account not found. Refresh and try again.');
 }
 

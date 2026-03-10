@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Choose Currency — CryptoCard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
+body{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1.5px,transparent 1.5px);background-size:26px 26px;}
+
+.setup-card{position:relative;z-index:1;width:100%;max-width:520px;background:#161A1F;border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:36px 32px;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+@media(max-width:480px){.setup-card{padding:24px 16px;border-radius:18px;}}
+
+.logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.25rem;color:#fff;}
+
+.title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;color:#fff;text-align:center;margin-bottom:6px;}
+.subtitle{font-size:.84rem;color:rgba(255,255,255,.45);text-align:center;margin-bottom:24px;line-height:1.6;}
+
+/* Search */
+.search-wrap{position:relative;margin-bottom:16px;}
+.search-input{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px 14px 12px 42px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:rgba(240,185,11,.4);}
+.search-input::placeholder{color:rgba(255,255,255,.25);}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.3);pointer-events:none;}
+
+/* Popular currencies */
+.popular-label{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.popular-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:400px){.popular-grid{grid-template-columns:repeat(3,1fr);}}
+.pop-btn{background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 6px;cursor:pointer;text-align:center;transition:all .2s;font-family:inherit;}
+.pop-btn:hover{border-color:rgba(240,185,11,.3);background:rgba(240,185,11,.06);}
+.pop-btn.selected{border-color:#F0B90B;background:rgba(240,185,11,.1);}
+.pop-flag{font-size:1.4rem;display:block;margin-bottom:3px;}
+.pop-code{font-size:.7rem;font-weight:700;color:#fff;font-family:'Space Grotesk',sans-serif;}
+
+/* Currency list */
+.currency-list{max-height:280px;overflow-y:auto;border:1px solid rgba(255,255,255,.07);border-radius:12px;margin-bottom:20px;}
+.currency-list::-webkit-scrollbar{width:4px;}
+.currency-list::-webkit-scrollbar-track{background:transparent;}
+.currency-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+.currency-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.04);}
+.currency-item:last-child{border-bottom:none;}
+.currency-item:hover{background:rgba(255,255,255,.04);}
+.currency-item.selected{background:rgba(240,185,11,.07);border-left:2px solid #F0B90B;}
+.ci-flag{font-size:1.3rem;flex-shrink:0;width:28px;text-align:center;}
+.ci-info{flex:1;min-width:0;}
+.ci-code{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.88rem;color:#fff;}
+.ci-name{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ci-rate{font-family:'IBM Plex Mono',monospace;font-size:.76rem;color:rgba(255,255,255,.5);text-align:right;flex-shrink:0;}
+.ci-check{color:#F0B90B;flex-shrink:0;display:none;}
+.currency-item.selected .ci-check{display:block;}
+
+/* Selected preview */
+.selected-preview{background:rgba(240,185,11,.06);border:1px solid rgba(240,185,11,.2);border-radius:12px;padding:14px 16px;margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+.sp-flag{font-size:2rem;}
+.sp-info{flex:1;}
+.sp-code{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;color:#F0B90B;}
+.sp-name{font-size:.76rem;color:rgba(255,255,255,.45);margin-top:2px;}
+.sp-rate{font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:rgba(255,255,255,.5);text-align:right;}
+
+.btn-gold{width:100%;padding:14px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:opacity .2s;}
+.btn-gold:hover{opacity:.9;}
+.btn-gold:disabled{opacity:.4;cursor:not-allowed;}
+.rate-note{text-align:center;font-size:.72rem;color:rgba(255,255,255,.2);margin-top:12px;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2329;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.6);transition:transform .3s;z-index:9999;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<script src="auth.js"></script>
+<script>
+// Only allow if logged in but no currency set
+const _sc = getCurrentUser();
+if(!_sc) window.location.href = 'auth.html';
+// Skip if already set
+if(_sc && _sc.defaultCurrency) window.location.href = 'dashboard.html';
+</script>
+
+<div class="setup-card">
+  <div class="logo">
+    <div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+    <span class="logo-name">CryptoCard</span>
+  </div>
+
+  <div class="title">Choose Your Currency</div>
+  <div class="subtitle">Select your local currency. Your USDC balance will be displayed and spent in this currency.</div>
+
+  <!-- Popular currencies -->
+  <div class="popular-label">Popular</div>
+  <div class="popular-grid" id="popularGrid"></div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" id="searchInput" placeholder="Search currency or country…" oninput="filterList()"/>
+  </div>
+
+  <!-- Selected preview -->
+  <div class="selected-preview" id="selectedPreview" style="display:none;">
+    <span class="sp-flag" id="spFlag">🇮🇳</span>
+    <div class="sp-info">
+      <div class="sp-code" id="spCode">INR</div>
+      <div class="sp-name" id="spName">Indian Rupee</div>
+    </div>
+    <div class="sp-rate" id="spRate">1 USDC = ₹83.50</div>
+  </div>
+
+  <!-- Full list -->
+  <div class="currency-list" id="currencyList"></div>
+
+  <button class="btn-gold" id="confirmBtn" onclick="confirmCurrency()" disabled>Continue to Dashboard →</button>
+  <div class="rate-note" id="rateNote">Loading live rates…</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ALL world currencies
+const ALL_CURRENCIES = [
+  {code:'USD',name:'US Dollar',flag:'🇺🇸',symbol:'$'},
+  {code:'EUR',name:'Euro',flag:'🇪🇺',symbol:'€'},
+  {code:'GBP',name:'British Pound',flag:'🇬🇧',symbol:'£'},
+  {code:'JPY',name:'Japanese Yen',flag:'🇯🇵',symbol:'¥'},
+  {code:'INR',name:'Indian Rupee',flag:'🇮🇳',symbol:'₹'},
+  {code:'CNY',name:'Chinese Yuan',flag:'🇨🇳',symbol:'¥'},
+  {code:'AUD',name:'Australian Dollar',flag:'🇦🇺',symbol:'A$'},
+  {code:'CAD',name:'Canadian Dollar',flag:'🇨🇦',symbol:'C$'},
+  {code:'CHF',name:'Swiss Franc',flag:'🇨🇭',symbol:'Fr'},
+  {code:'HKD',name:'Hong Kong Dollar',flag:'🇭🇰',symbol:'HK$'},
+  {code:'SGD',name:'Singapore Dollar',flag:'🇸🇬',symbol:'S$'},
+  {code:'SEK',name:'Swedish Krona',flag:'🇸🇪',symbol:'kr'},
+  {code:'NOK',name:'Norwegian Krone',flag:'🇳🇴',symbol:'kr'},
+  {code:'DKK',name:'Danish Krone',flag:'🇩🇰',symbol:'kr'},
+  {code:'NZD',name:'New Zealand Dollar',flag:'🇳🇿',symbol:'NZ$'},
+  {code:'KRW',name:'South Korean Won',flag:'🇰🇷',symbol:'₩'},
+  {code:'BRL',name:'Brazilian Real',flag:'🇧🇷',symbol:'R$'},
+  {code:'MXN',name:'Mexican Peso',flag:'🇲🇽',symbol:'$'},
+  {code:'IDR',name:'Indonesian Rupiah',flag:'🇮🇩',symbol:'Rp'},
+  {code:'TRY',name:'Turkish Lira',flag:'🇹🇷',symbol:'₺'},
+  {code:'RUB',name:'Russian Ruble',flag:'🇷🇺',symbol:'₽'},
+  {code:'ZAR',name:'South African Rand',flag:'🇿🇦',symbol:'R'},
+  {code:'ARS',name:'Argentine Peso',flag:'🇦🇷',symbol:'$'},
+  {code:'CLP',name:'Chilean Peso',flag:'🇨🇱',symbol:'$'},
+  {code:'COP',name:'Colombian Peso',flag:'🇨🇴',symbol:'$'},
+  {code:'PEN',name:'Peruvian Sol',flag:'🇵🇪',symbol:'S/'},
+  {code:'VES',name:'Venezuelan Bolívar',flag:'🇻🇪',symbol:'Bs'},
+  {code:'BOB',name:'Bolivian Boliviano',flag:'🇧🇴',symbol:'Bs'},
+  {code:'UYU',name:'Uruguayan Peso',flag:'🇺🇾',symbol:'$'},
+  {code:'PYG',name:'Paraguayan Guaraní',flag:'🇵🇾',symbol:'₲'},
+  {code:'AED',name:'UAE Dirham',flag:'🇦🇪',symbol:'د.إ'},
+  {code:'SAR',name:'Saudi Riyal',flag:'🇸🇦',symbol:'﷼'},
+  {code:'QAR',name:'Qatari Riyal',flag:'🇶🇦',symbol:'﷼'},
+  {code:'KWD',name:'Kuwaiti Dinar',flag:'🇰🇼',symbol:'د.ك'},
+  {code:'BHD',name:'Bahraini Dinar',flag:'🇧🇭',symbol:'.د.ب'},
+  {code:'OMR',name:'Omani Rial',flag:'🇴🇲',symbol:'﷼'},
+  {code:'JOD',name:'Jordanian Dinar',flag:'🇯🇴',symbol:'د.ا'},
+  {code:'ILS',name:'Israeli Shekel',flag:'🇮🇱',symbol:'₪'},
+  {code:'EGP',name:'Egyptian Pound',flag:'🇪🇬',symbol:'£'},
+  {code:'MAD',name:'Moroccan Dirham',flag:'🇲🇦',symbol:'د.م.'},
+  {code:'TND',name:'Tunisian Dinar',flag:'🇹🇳',symbol:'د.ت'},
+  {code:'GHS',name:'Ghanaian Cedi',flag:'🇬🇭',symbol:'₵'},
+  {code:'NGN',name:'Nigerian Naira',flag:'🇳🇬',symbol:'₦'},
+  {code:'KES',name:'Kenyan Shilling',flag:'🇰🇪',symbol:'KSh'},
+  {code:'TZS',name:'Tanzanian Shilling',flag:'🇹🇿',symbol:'TSh'},
+  {code:'UGX',name:'Ugandan Shilling',flag:'🇺🇬',symbol:'USh'},
+  {code:'ETB',name:'Ethiopian Birr',flag:'🇪🇹',symbol:'Br'},
+  {code:'XOF',name:'West African CFA',flag:'🌍',symbol:'CFA'},
+  {code:'XAF',name:'Central African CFA',flag:'🌍',symbol:'CFA'},
+  {code:'DZD',name:'Algerian Dinar',flag:'🇩🇿',symbol:'د.ج'},
+  {code:'LYD',name:'Libyan Dinar',flag:'🇱🇾',symbol:'ل.د'},
+  {code:'SDG',name:'Sudanese Pound',flag:'🇸🇩',symbol:'ج.س.'},
+  {code:'THB',name:'Thai Baht',flag:'🇹🇭',symbol:'฿'},
+  {code:'VND',name:'Vietnamese Dong',flag:'🇻🇳',symbol:'₫'},
+  {code:'PHP',name:'Philippine Peso',flag:'🇵🇭',symbol:'₱'},
+  {code:'MYR',name:'Malaysian Ringgit',flag:'🇲🇾',symbol:'RM'},
+  {code:'TWD',name:'Taiwan Dollar',flag:'🇹🇼',symbol:'NT$'},
+  {code:'PKR',name:'Pakistani Rupee',flag:'🇵🇰',symbol:'₨'},
+  {code:'BDT',name:'Bangladeshi Taka',flag:'🇧🇩',symbol:'৳'},
+  {code:'LKR',name:'Sri Lankan Rupee',flag:'🇱🇰',symbol:'₨'},
+  {code:'NPR',name:'Nepalese Rupee',flag:'🇳🇵',symbol:'₨'},
+  {code:'MMK',name:'Myanmar Kyat',flag:'🇲🇲',symbol:'K'},
+  {code:'KHR',name:'Cambodian Riel',flag:'🇰🇭',symbol:'៛'},
+  {code:'LAK',name:'Lao Kip',flag:'🇱🇦',symbol:'₭'},
+  {code:'MNT',name:'Mongolian Tögrög',flag:'🇲🇳',symbol:'₮'},
+  {code:'KZT',name:'Kazakhstani Tenge',flag:'🇰🇿',symbol:'₸'},
+  {code:'UZS',name:'Uzbekistani Som',flag:'🇺🇿',symbol:'лв'},
+  {code:'AMD',name:'Armenian Dram',flag:'🇦🇲',symbol:'֏'},
+  {code:'GEL',name:'Georgian Lari',flag:'🇬🇪',symbol:'₾'},
+  {code:'AZN',name:'Azerbaijani Manat',flag:'🇦🇿',symbol:'₼'},
+  {code:'UAH',name:'Ukrainian Hryvnia',flag:'🇺🇦',symbol:'₴'},
+  {code:'BYN',name:'Belarusian Ruble',flag:'🇧🇾',symbol:'Br'},
+  {code:'MDL',name:'Moldovan Leu',flag:'🇲🇩',symbol:'L'},
+  {code:'RON',name:'Romanian Leu',flag:'🇷🇴',symbol:'lei'},
+  {code:'BGN',name:'Bulgarian Lev',flag:'🇧🇬',symbol:'лв'},
+  {code:'HRK',name:'Croatian Kuna',flag:'🇭🇷',symbol:'kn'},
+  {code:'RSD',name:'Serbian Dinar',flag:'🇷🇸',symbol:'din'},
+  {code:'BAM',name:'Bosnia Mark',flag:'🇧🇦',symbol:'KM'},
+  {code:'MKD',name:'Macedonian Denar',flag:'🇲🇰',symbol:'ден'},
+  {code:'ALL',name:'Albanian Lek',flag:'🇦🇱',symbol:'L'},
+  {code:'HUF',name:'Hungarian Forint',flag:'🇭🇺',symbol:'Ft'},
+  {code:'CZK',name:'Czech Koruna',flag:'🇨🇿',symbol:'Kč'},
+  {code:'PLN',name:'Polish Zloty',flag:'🇵🇱',symbol:'zł'},
+  {code:'ISK',name:'Icelandic Króna',flag:'🇮🇸',symbol:'kr'},
+  {code:'HNL',name:'Honduran Lempira',flag:'🇭🇳',symbol:'L'},
+  {code:'GTQ',name:'Guatemalan Quetzal',flag:'🇬🇹',symbol:'Q'},
+  {code:'CRC',name:'Costa Rican Colón',flag:'🇨🇷',symbol:'₡'},
+  {code:'NIO',name:'Nicaraguan Córdoba',flag:'🇳🇮',symbol:'C$'},
+  {code:'PAB',name:'Panamanian Balboa',flag:'🇵🇦',symbol:'B/.'},
+  {code:'DOP',name:'Dominican Peso',flag:'🇩🇴',symbol:'RD$'},
+  {code:'CUP',name:'Cuban Peso',flag:'🇨🇺',symbol:'$'},
+  {code:'JMD',name:'Jamaican Dollar',flag:'🇯🇲',symbol:'J$'},
+  {code:'TTD',name:'Trinidad Dollar',flag:'🇹🇹',symbol:'TT$'},
+  {code:'BBD',name:'Barbadian Dollar',flag:'🇧🇧',symbol:'$'},
+  {code:'XCD',name:'East Caribbean Dollar',flag:'🌴',symbol:'$'},
+  {code:'BSD',name:'Bahamian Dollar',flag:'🇧🇸',symbol:'$'},
+  {code:'BZD',name:'Belize Dollar',flag:'🇧🇿',symbol:'$'},
+  {code:'GYD',name:'Guyanese Dollar',flag:'🇬🇾',symbol:'$'},
+  {code:'SRD',name:'Surinamese Dollar',flag:'🇸🇷',symbol:'$'},
+  {code:'AWG',name:'Aruban Florin',flag:'🇦🇼',symbol:'ƒ'},
+  {code:'AFN',name:'Afghan Afghani',flag:'🇦🇫',symbol:'؋'},
+  {code:'IRR',name:'Iranian Rial',flag:'🇮🇷',symbol:'﷼'},
+  {code:'IQD',name:'Iraqi Dinar',flag:'🇮🇶',symbol:'ع.د'},
+  {code:'SYP',name:'Syrian Pound',flag:'🇸🇾',symbol:'£'},
+  {code:'LBP',name:'Lebanese Pound',flag:'🇱🇧',symbol:'£'},
+  {code:'YER',name:'Yemeni Rial',flag:'🇾🇪',symbol:'﷼'},
+  {code:'MZN',name:'Mozambican Metical',flag:'🇲🇿',symbol:'MT'},
+  {code:'ZMW',name:'Zambian Kwacha',flag:'🇿🇲',symbol:'ZK'},
+  {code:'ZWL',name:'Zimbabwean Dollar',flag:'🇿🇼',symbol:'$'},
+  {code:'AOA',name:'Angolan Kwanza',flag:'🇦🇴',symbol:'Kz'},
+  {code:'BWP',name:'Botswanan Pula',flag:'🇧🇼',symbol:'P'},
+  {code:'NAD',name:'Namibian Dollar',flag:'🇳🇦',symbol:'$'},
+  {code:'MWK',name:'Malawian Kwacha',flag:'🇲🇼',symbol:'MK'},
+  {code:'RWF',name:'Rwandan Franc',flag:'🇷🇼',symbol:'Fr'},
+  {code:'BIF',name:'Burundian Franc',flag:'🇧🇮',symbol:'Fr'},
+  {code:'DJF',name:'Djiboutian Franc',flag:'🇩🇯',symbol:'Fr'},
+  {code:'ERN',name:'Eritrean Nakfa',flag:'🇪🇷',symbol:'Nfk'},
+  {code:'SOS',name:'Somali Shilling',flag:'🇸🇴',symbol:'Sh'},
+  {code:'MGA',name:'Malagasy Ariary',flag:'🇲🇬',symbol:'Ar'},
+  {code:'SCR',name:'Seychellois Rupee',flag:'🇸🇨',symbol:'₨'},
+  {code:'MUR',name:'Mauritian Rupee',flag:'🇲🇺',symbol:'₨'},
+  {code:'CVE',name:'Cape Verdean Escudo',flag:'🇨🇻',symbol:'$'},
+  {code:'STN',name:'São Tomé Dobra',flag:'🇸🇹',symbol:'Db'},
+  {code:'GMD',name:'Gambian Dalasi',flag:'🇬🇲',symbol:'D'},
+  {code:'GNF',name:'Guinean Franc',flag:'🇬🇳',symbol:'Fr'},
+  {code:'SLL',name:'Sierra Leonean Leone',flag:'🇸🇱',symbol:'Le'},
+  {code:'LRD',name:'Liberian Dollar',flag:'🇱🇷',symbol:'$'},
+  {code:'CDF',name:'Congolese Franc',flag:'🇨🇩',symbol:'Fr'},
+  {code:'NZD',name:'New Zealand Dollar',flag:'🇳🇿',symbol:'NZ$'},
+  {code:'FJD',name:'Fijian Dollar',flag:'🇫🇯',symbol:'$'},
+  {code:'PGK',name:'Papua New Guinea Kina',flag:'🇵🇬',symbol:'K'},
+  {code:'SBD',name:'Solomon Islands Dollar',flag:'🇸🇧',symbol:'$'},
+  {code:'VUV',name:'Vanuatu Vatu',flag:'🇻🇺',symbol:'Vt'},
+  {code:'WST',name:'Samoan Tala',flag:'🇼🇸',symbol:'T'},
+  {code:'TOP',name:'Tongan Paʻanga',flag:'🇹🇴',symbol:'T$'},
+  {code:'KYD',name:'Cayman Islands Dollar',flag:'🇰🇾',symbol:'$'},
+  {code:'BMD',name:'Bermudian Dollar',flag:'🇧🇲',symbol:'$'},
+];
+
+const POPULAR = ['USD','EUR','GBP','INR','IDR','BRL','ARS','VES','AED','NGN','MXN','JPY'];
+
+let selectedCode = null;
+let rates = {};
+let filteredList = [...ALL_CURRENCIES];
+
+async function fetchRates() {
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
+    const d = await r.json();
+    if(d.rates) {
+      rates = d.rates;
+      document.getElementById('rateNote').textContent = 'Live rates · Updated just now';
+      renderList();
+      renderPopular();
+    }
+  } catch(e) {
+    // Use fallback
+    rates = {USD:1,EUR:0.92,GBP:0.79,JPY:149,INR:83.5,CNY:7.2,AUD:1.53,CAD:1.36,CHF:0.88,HKD:7.82,SGD:1.34,KRW:1325,BRL:5.05,MXN:17.1,IDR:15800,TRY:30.5,ZAR:18.6,ARS:890,AED:3.67,SAR:3.75,NGN:1450,VES:36,THB:35,VND:24500,PHP:56,MYR:4.7,PKR:278,BDT:110};
+    document.getElementById('rateNote').textContent = 'Estimated rates (offline)';
+    renderList();
+    renderPopular();
+  }
+}
+
+function getRate(code) { return rates[code] || null; }
+
+function formatRate(code, symbol) {
+  const r = getRate(code);
+  if(!r) return '—';
+  const val = r;
+  return '1 USDC = ' + symbol + (val > 1000 ? Math.round(val).toLocaleString() : val > 10 ? val.toFixed(2) : val.toFixed(4));
+}
+
+function renderPopular() {
+  const grid = document.getElementById('popularGrid');
+  grid.innerHTML = POPULAR.map(code => {
+    const c = ALL_CURRENCIES.find(x => x.code === code);
+    if(!c) return '';
+    return `<button class="pop-btn ${selectedCode===code?'selected':''}" onclick="selectCurrency('${code}')">
+      <span class="pop-flag">${c.flag}</span>
+      <span class="pop-code">${code}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderList() {
+  const list = document.getElementById('currencyList');
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  filteredList = q
+    ? ALL_CURRENCIES.filter(c => c.code.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
+    : ALL_CURRENCIES;
+
+  list.innerHTML = filteredList.map(c => {
+    const r = getRate(c.code);
+    const rateStr = r ? (c.symbol + (r > 1000 ? Math.round(r).toLocaleString() : r > 10 ? r.toFixed(2) : r.toFixed(4))) : '—';
+    return `<div class="currency-item ${selectedCode===c.code?'selected':''}" onclick="selectCurrency('${c.code}')">
+      <span class="ci-flag">${c.flag}</span>
+      <div class="ci-info"><div class="ci-code">${c.code}</div><div class="ci-name">${c.name}</div></div>
+      <div class="ci-rate">${rateStr}</div>
+      <svg class="ci-check" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>`;
+  }).join('') || '<div style="padding:30px;text-align:center;color:rgba(255,255,255,.3);font-size:.84rem;">No currencies found</div>';
+}
+
+function filterList() { renderList(); }
+
+function selectCurrency(code) {
+  selectedCode = code;
+  const c = ALL_CURRENCIES.find(x => x.code === code);
+  if(!c) return;
+
+  // Update preview
+  document.getElementById('selectedPreview').style.display = 'flex';
+  document.getElementById('spFlag').textContent = c.flag;
+  document.getElementById('spCode').textContent = c.code;
+  document.getElementById('spName').textContent = c.name;
+  document.getElementById('spRate').textContent = formatRate(code, c.symbol);
+
+  document.getElementById('confirmBtn').disabled = false;
+  document.getElementById('confirmBtn').textContent = 'Use ' + c.code + ' →';
+
+  renderList();
+  renderPopular();
+}
+
+function confirmCurrency() {
+  if(!selectedCode) return;
+  const c = ALL_CURRENCIES.find(x => x.code === selectedCode);
+  updateCurrentUser({
+    defaultCurrency: selectedCode,
+    defaultCurrencySymbol: c.symbol,
+    defaultCurrencyName: c.name,
+    defaultCurrencyFlag: c.flag
+  });
+  window.location.href = 'dashboard.html';
+}
+
+// Init
+fetchRates();
+</script>
+</body>
+</html>
