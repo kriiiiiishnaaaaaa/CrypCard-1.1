@@ -165,6 +165,8 @@ body::before{content:'';position:fixed;top:-200px;left:50%;transform:translateX(
       <div class="step-sub" id="otpSubtext">We sent a 6-digit code to your email. Check your inbox.</div>
     </div>
     <div class="err-box" id="otpErr"></div>
+    <!-- Dev hint shown when EmailJS not configured -->
+    <div id="otpDevHint" style="display:none;background:rgba(240,185,11,.08);border:1px solid rgba(240,185,11,.25);border-radius:10px;padding:10px 14px;font-size:.82rem;color:#F0B90B;margin-bottom:16px;text-align:center;font-family:'IBM Plex Mono',monospace;letter-spacing:1px;"></div>
     <!-- 6-digit OTP boxes -->
     <div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px;" id="otpBoxRow">
       <input class="otp-box" id="ob0" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]"/>
@@ -548,9 +550,18 @@ function doVerify() {
 
 // ── OTP SYSTEM ──
 // EmailJS config
+/* ═══════════════════════════════════════════
+   EMAILJS SETUP — To enable real OTP emails:
+   1. Go to https://www.emailjs.com (free)
+   2. Create account → Add Email Service (Gmail)
+   3. Create Template with variables:
+      {{to_email}}, {{to_name}}, {{otp_code}}, {{app_name}}
+   4. Replace the 3 values below with your credentials
+   ═══════════════════════════════════════════ */
 const EMAILJS_PUBLIC_KEY  = 'YOUR_EMAILJS_PUBLIC_KEY';
 const EMAILJS_SERVICE_ID  = 'YOUR_EMAILJS_SERVICE_ID';
 const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';
+const EMAILJS_CONFIGURED  = (EMAILJS_PUBLIC_KEY !== 'YOUR_EMAILJS_PUBLIC_KEY');
 
 let _otpCode = '';
 let _otpExpiry = 0;
@@ -566,6 +577,21 @@ function sendOTP(email, name, onSuccess, onFallback) {
   _otpExpiry = Date.now() + 10 * 60 * 1000; // 10 min
   document.getElementById('otpErr').style.display = 'none';
 
+  if(!EMAILJS_CONFIGURED) {
+    // Dev mode: show OTP on screen
+    startOTPTimer();
+    onSuccess();
+    // Show code visually for testing
+    setTimeout(() => {
+      const devBox = document.getElementById('otpDevHint');
+      if(devBox) {
+        devBox.style.display = 'block';
+        devBox.textContent = '🔑 Dev Mode — Your OTP: ' + _otpCode;
+      }
+    }, 300);
+    return;
+  }
+
   emailjs.init(EMAILJS_PUBLIC_KEY);
   emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
     to_email: email,
@@ -576,8 +602,16 @@ function sendOTP(email, name, onSuccess, onFallback) {
     startOTPTimer();
     onSuccess();
   }).catch(() => {
-    // Silently skip OTP if EmailJS not configured
-    onFallback();
+    // Fallback: show OTP on screen
+    startOTPTimer();
+    onSuccess();
+    setTimeout(() => {
+      const devBox = document.getElementById('otpDevHint');
+      if(devBox) {
+        devBox.style.display = 'block';
+        devBox.textContent = '⚠️ Email failed — Your OTP: ' + _otpCode;
+      }
+    }, 300);
   });
 }
 
