@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>Deposit &mdash; CryptoCard</title>
-<link rel="stylesheet" href="style.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1.5px,transparent 1.5px);background-size:26px 26px;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
@@ -26,60 +22,31 @@ body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,2
 .avatar-btn{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F0B90B,#F8D12F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#000;cursor:pointer;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
 .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:160;}
 .sidebar-backdrop.show{display:block;}
+.page-main{margin-left:220px;flex:1;padding:72px 24px 80px;}
+.page-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
+.page-toast.show{transform:translateX(-50%) translateY(0);}
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
-  .page-topbar{left:0 !important;right:0 !important;padding:12px 16px !important;}
-  .page-main{margin-left:0 !important;padding-left:16px !important;padding-right:16px !important;}
+  .page-topbar{left:0!important;right:0!important;padding:12px 16px!important;}
+  .page-main{margin-left:0!important;padding-left:16px!important;padding-right:16px!important;padding-top:72px!important;}
 }
-
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1.5px,transparent 1.5px);background-size:26px 26px;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
-.page-layout{display:flex;}
-
-
-
-
-
-
-
-
-
-
-
-
-
-.search-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:7px 16px;font-size:.82rem;color:rgba(255,255,255,.35);cursor:pointer;min-width:160px;}
-
-.page-main{margin-left:220px;flex:1;padding:86px 24px 80px;}
-.addr-card{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:28px;margin-bottom:16px;}
-.addr-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;}
-.addr-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0;font-family:'Space Grotesk',sans-serif;}
-.addr-net-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;}
-.addr-net-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-top:2px;}
-.qr-addr-row{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;}
-.qr-box{background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;}
-.qr-box img{width:140px;height:140px;border-radius:8px;display:block;}
-.qr-lbl{font-size:.7rem;color:rgba(255,255,255,.3);font-weight:500;}
-.addr-info{flex:1;min-width:200px;}
-.addr-label{font-size:.72rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600;}
-.addr-value{font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:#fff;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;word-break:break-all;line-height:1.6;margin-bottom:12px;}
-.copy-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.28);border-radius:100px;color:#F0B90B;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
-.copy-btn:hover{background:rgba(240,185,11,.18);}
-.warn-box{background:rgba(246,70,93,.05);border:1px solid rgba(246,70,93,.2);border-radius:12px;padding:13px 16px;font-size:.8rem;color:rgba(246,70,93,.85);margin-bottom:22px;display:flex;gap:9px;align-items:flex-start;}
-.panel{display:none;position:fixed;top:60px;right:12px;background:#161A1F;border:1px solid rgba(255,255,255,.1);border-radius:16px;z-index:800;box-shadow:0 20px 60px rgba(0,0,0,.8);overflow:hidden;}
-.dash-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:1000;white-space:nowrap;}
-.dash-toast.show{transform:translateX(-50%) translateY(0);}
-
-@media(max-width:900px){
-  
-  .page-main{margin-left:0;padding-left:16px;padding-right:16px}
-  
-  
-}
-@media(max-width:580px){.qr-addr-row{flex-direction:column;}.qr-box{width:100%;flex-direction:row;}.qr-box img{width:100px;height:100px}}
-
+.dep-box{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px;margin-bottom:18px;}
+.dep-box-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;color:#fff;margin-bottom:4px;}
+.dep-box-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:16px;}
+.addr-box{background:#0B0E11;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:.82rem;color:rgba(255,255,255,.7);word-break:break-all;margin-bottom:10px;line-height:1.6;}
+.copy-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;background:rgba(240,185,11,.08);border:1px solid rgba(240,185,11,.2);border-radius:10px;color:#F0B90B;font-size:.84rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.copy-btn:hover{background:rgba(240,185,11,.15);}
+.qr-wrap{display:flex;justify-content:center;margin:16px 0;}
+.min-note{font-size:.78rem;color:rgba(255,255,255,.35);text-align:center;margin-top:8px;}
+.step-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.step-list li{display:flex;gap:12px;align-items:flex-start;font-size:.84rem;color:rgba(255,255,255,.6);line-height:1.5;}
+.step-num{width:22px;height:22px;border-radius:50%;background:rgba(240,185,11,.12);border:1px solid rgba(240,185,11,.25);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#F0B90B;flex-shrink:0;margin-top:1px;}
 </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Deposit &mdash; CryptoCard</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <script src="auth.js"></script>

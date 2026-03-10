@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>KYC &mdash; CryptoCard</title>
-<link rel="stylesheet" href="style.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1.5px,transparent 1.5px);background-size:26px 26px;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
@@ -26,79 +22,37 @@ body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,2
 .avatar-btn{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F0B90B,#F8D12F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#000;cursor:pointer;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
 .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:160;}
 .sidebar-backdrop.show{display:block;}
+.page-main{margin-left:220px;flex:1;padding:72px 24px 80px;}
+.page-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
+.page-toast.show{transform:translateX(-50%) translateY(0);}
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
-  .page-topbar{left:0 !important;right:0 !important;padding:12px 16px !important;}
-  .page-main{margin-left:0 !important;padding-left:16px !important;padding-right:16px !important;}
+  .page-topbar{left:0!important;right:0!important;padding:12px 16px!important;}
+  .page-main{margin-left:0!important;padding-left:16px!important;padding-right:16px!important;padding-top:72px!important;}
 }
-
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0B0E11;color:#EAECEF;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
-.page-layout{display:flex;}
-
-
-
-
-
-
-
-
-
-
-.page-main{margin-left:220px;flex:1;padding:28px 32px;min-height:100vh;}
-
-
-
-.search-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:7px 16px;font-size:.82rem;color:rgba(255,255,255,.35);cursor:pointer;min-width:150px;}
-
-.page-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.5rem;color:#EAECEF;}
-.page-subtitle{font-size:.82rem;color:rgba(234,236,239,.4);margin-top:4px;}
-.avatar-circle{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#F0B90B,#F8D12F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#000;cursor:pointer;font-family:'Space Grotesk',sans-serif;}
-.card-box{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px;margin-bottom:20px;}
-.card-box-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:1rem;color:#EAECEF;margin-bottom:16px;}
-.form-label{font-size:.76rem;color:rgba(234,236,239,.5);font-weight:600;margin-bottom:6px;display:block;text-transform:uppercase;letter-spacing:.4px;}
-.form-input{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:#EAECEF;font-size:.9rem;font-family:inherit;outline:none;transition:border-color .2s;}
+.kyc-box{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px;margin-bottom:18px;}
+.kyc-box-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;color:#fff;margin-bottom:4px;}
+.kyc-box-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:16px;}
+.form-group{margin-bottom:14px;}
+.form-label{font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:5px;display:block;}
+.form-input{width:100%;background:#0B0E11;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
 .form-input:focus{border-color:rgba(240,185,11,.4);}
-.form-select{width:100%;background:#0D1117;border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px;color:#EAECEF;font-size:.9rem;font-family:inherit;outline:none;}
-.form-group{margin-bottom:18px;}
-.btn-gold{background:linear-gradient(135deg,#F0B90B,#F8D12F);color:#000;font-weight:700;border:none;border-radius:10px;padding:13px 28px;font-size:.9rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;justify-content:center;}
-.btn-gold:hover{opacity:.85;}
-.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 22px;color:rgba(234,236,239,.7);font-size:.88rem;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;}
-.btn-ghost:hover{border-color:rgba(255,255,255,.2);color:#EAECEF;}
-.step-progress{display:flex;align-items:center;gap:0;margin-bottom:28px;}
-.step-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem;flex-shrink:0;font-family:'Space Grotesk',sans-serif;transition:all .3s;}
-.step-line-seg{flex:1;height:2px;transition:background .3s;}
-.step-block{display:none;}
-.step-block.active{display:block;}
-input[type=file]{display:none;}
-.file-drop{border:2px dashed rgba(255,255,255,.1);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color .2s;font-size:.85rem;color:rgba(234,236,239,.4);}
-.file-drop:hover{border-color:rgba(240,185,11,.35);color:#F0B90B;}
-.two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.mob-menu-btn{display:none !important;position:fixed;bottom:20px;left:20px;z-index:200;width:44px;height:44px;border-radius:50%;background:#F0B90B;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(240,185,11,.4);}
-
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
-.toast.show{transform:translateX(-50%) translateY(0);}
-@media(max-width:900px){.page-main{margin-left:0;padding:20px 16px 80px}
-@media(max-width:600px){.two-col-grid{grid-template-columns:1fr}.page-title{font-size:1.2rem}.card-box{padding:16px}}
-
-/* HEADER LOCK OVERRIDE */
-@media(max-width:900px){
-  
-
-
-.search-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:7px 16px;font-size:.82rem;color:rgba(255,255,255,.35);cursor:pointer;min-width:150px;}
-
-  .page-main{padding-top:72px !important; margin-left:0 !important;}
-}
-
-
-
-.search-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:7px 16px;font-size:.82rem;color:rgba(255,255,255,.35);cursor:pointer;min-width:150px;}
-
-
-
+.form-select{width:100%;background:#0B0E11;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:.88rem;outline:none;cursor:pointer;}
+.upload-area{border:1.5px dashed rgba(255,255,255,.15);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s;}
+.upload-area:hover{border-color:rgba(240,185,11,.3);}
+.upload-icon{color:rgba(255,255,255,.3);margin-bottom:8px;}
+.upload-text{font-size:.82rem;color:rgba(255,255,255,.4);}
+.btn-gold{padding:13px 28px;background:linear-gradient(135deg,#F0B90B,#F8D12F);border:none;border-radius:12px;color:#000;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:opacity .2s;}
+.btn-gold:hover{opacity:.9;}
+.status-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:100px;font-size:.75rem;font-weight:600;}
+.status-pending{background:rgba(240,185,11,.1);border:1px solid rgba(240,185,11,.25);color:#F0B90B;}
+.status-verified{background:rgba(14,203,129,.1);border:1px solid rgba(14,203,129,.25);color:#0ECB81;}
 </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>KYC &mdash; CryptoCard</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <script src="auth.js"></script>

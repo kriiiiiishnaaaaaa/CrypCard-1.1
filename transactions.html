@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<title>Transactions &mdash; CryptoCard</title>
-<link rel="stylesheet" href="style.css"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1.5px,transparent 1.5px);background-size:26px 26px;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
@@ -26,50 +22,36 @@ body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,2
 .avatar-btn{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#F0B90B,#F8D12F);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;color:#000;cursor:pointer;font-family:'Space Grotesk',sans-serif;flex-shrink:0;}
 .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:160;}
 .sidebar-backdrop.show{display:block;}
+.page-main{margin-left:220px;flex:1;padding:72px 24px 80px;}
+.page-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:999;white-space:nowrap;}
+.page-toast.show{transform:translateX(-50%) translateY(0);}
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
-  .page-topbar{left:0 !important;right:0 !important;padding:12px 16px !important;}
-  .page-main{margin-left:0 !important;padding-left:16px !important;padding-right:16px !important;}
+  .page-topbar{left:0!important;right:0!important;padding:12px 16px!important;}
+  .page-main{margin-left:0!important;padding-left:16px!important;padding-right:16px!important;padding-top:72px!important;}
 }
-
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background-color:#0B0E11;background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1.5px,transparent 1.5px);background-size:26px 26px;color:#fff;font-family:'IBM Plex Sans',-apple-system,sans-serif;}
-.page-layout{display:flex;}
-
-
-
-
-
-
-
-
-
-
-.page-main{margin-left:220px;flex:1;padding:72px 24px 80px;}
-
-
-
-.search-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:100px;padding:7px 16px;font-size:.82rem;color:rgba(255,255,255,.35);cursor:pointer;min-width:150px;}
-
-.card-box{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px;margin-bottom:18px;}
-.tx-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.04);gap:10px;}
-.tx-row:last-child{border-bottom:none;}
-.tx-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.tx-empty{text-align:center;padding:60px 20px;}
-.panel{display:none;position:fixed;top:60px;right:12px;background:#161A1F;border:1px solid rgba(255,255,255,.1);border-radius:16px;z-index:800;box-shadow:0 20px 60px rgba(0,0,0,.8);overflow:hidden;}
-.dash-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:#1E2026;border:1px solid rgba(240,185,11,.3);border-radius:12px;padding:11px 20px;font-size:.84rem;color:#F0B90B;box-shadow:0 8px 32px rgba(0,0,0,.5);transition:transform .3s;z-index:1000;white-space:nowrap;}
-.dash-toast.show{transform:translateX(-50%) translateY(0);}
-.mob-menu-btn{display:none !important;position:fixed;bottom:20px;left:20px;z-index:200;width:44px;height:44px;border-radius:50%;background:#F0B90B;border:none;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(240,185,11,.4);}
-
-@media(max-width:900px){
-  
-  .page-main{margin-left:0;padding-left:16px;padding-right:16px}
-  
-  
-}
-
+.tx-box{background:#161A1F;border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px;margin-bottom:18px;}
+.tx-box-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:.95rem;color:#fff;margin-bottom:16px;}
+.tx-item{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.tx-item:last-child{border-bottom:none;}
+.tx-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tx-icon-in{background:rgba(14,203,129,.1);}
+.tx-icon-out{background:rgba(246,70,93,.1);}
+.tx-info{flex:1;}
+.tx-name{font-size:.88rem;font-weight:500;color:#fff;}
+.tx-date{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:2px;}
+.tx-amount{font-family:'IBM Plex Mono',monospace;font-size:.9rem;font-weight:600;}
+.tx-in{color:#0ECB81;}
+.tx-out{color:#F6465D;}
+.empty-state{text-align:center;padding:48px 20px;color:rgba(255,255,255,.3);}
+.empty-state svg{margin-bottom:12px;opacity:.3;}
+.empty-state p{font-size:.88rem;}
 </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Transactions &mdash; CryptoCard</title>
+<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 <script src="auth.js"></script>
